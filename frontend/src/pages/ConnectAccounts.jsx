@@ -63,7 +63,7 @@ export default function ConnectAccounts() {
                 </div>
               </div>
               <button
-                onClick={() => window.location.href = `http://localhost:8000/${p.id}/connect?user_id=demo-user`}
+                onClick={() => window.location.href = `http://localhost:8000/auth/${p.id}?user_id=demo-user`}
                 style={{ padding: '8px 18px', borderRadius: 8, background: '#1a1a18', color: '#fff', border: 'none', fontSize: 13, fontWeight: 500, cursor: 'pointer', flexShrink: 0 }}>
                 Connect
               </button>
