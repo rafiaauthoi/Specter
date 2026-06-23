@@ -3,7 +3,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom'
 import Footer from '../components/Footer'
 
 const USER_ID = localStorage.getItem('user_id') || 'demo-user'
-const API_URL = 'http://localhost:8000'
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000'
 
 const riskColors = {
   high:   { bg: '#FCEBEB', color: '#791F1F' },
