@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import Footer from '../components/Footer'
 
 const brokers = [
   { id: 'spokeo',                   name: 'Spokeo',                    risk: 'high',   url: 'https://www.spokeo.com/optout',                                    steps: ['Go to spokeo.com/optout', 'Search your name and state', 'Find your listing', 'Click "Remove this listing"', 'Confirm via email'] },
@@ -62,7 +63,7 @@ ${userInfo.name}`
 
       <button onClick={() => navigate('/dashboard')}
         style={{ background: 'none', border: 'none', color: '#6b6b67', fontSize: 13, cursor: 'pointer', marginBottom: 24, padding: 0 }}>
-        ← Back to dashboard
+        Back to dashboard
       </button>
 
       <h1 style={{ fontSize: 20, fontWeight: 500, margin: '0 0 6px' }}>Data broker removal</h1>
@@ -70,12 +71,10 @@ ${userInfo.name}`
         These sites collect and sell your personal information. Remove yourself from each one.
       </p>
 
-      {/* Reminder banner */}
-      <div style={{ background: '#EEEDFE', border: '0.5px solid #AFA9EC', borderRadius: 10, padding: '12px 16px', marginBottom: 20, fontSize: 13, color: '#3C3489' }}>
-        <strong>Set a reminder</strong> : data brokers re-add your info every 3-6 months. Come back and repeat this process twice a year.
+      <div style={{ background: '#f5f4f0', borderRadius: 10, padding: '12px 16px', marginBottom: 20, fontSize: 13, color: '#3C3489', border: '0.5px solid #AFA9EC' }}>
+        <strong>Set a reminder.</strong> Data brokers re-add your info every 3 to 6 months. Come back and repeat this process twice a year.
       </div>
 
-      {/* Email generator */}
       <div style={{ background: '#f5f4f0', borderRadius: 12, padding: '14px 18px', marginBottom: 24 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div>
@@ -102,7 +101,7 @@ ${userInfo.name}`
               style={{ padding: '8px 12px', borderRadius: 8, border: '0.5px solid rgba(0,0,0,0.15)', fontSize: 13, outline: 'none' }}
             />
             <p style={{ fontSize: 11, color: '#9e9e9a', margin: 0 }}>
-              This info stays in your browser only — it is never sent to our servers.
+              This info stays in your browser only. It is never sent to our servers.
             </p>
             {userInfo.name && userInfo.email && (
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginTop: 4 }}>
@@ -118,19 +117,18 @@ ${userInfo.name}`
         )}
       </div>
 
-      {/* Email modal */}
       {emailModal && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.4)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 100 }}
           onClick={() => setEmailModal(null)}>
           <div style={{ background: '#fff', borderRadius: 14, padding: 24, maxWidth: 540, width: '90%', boxShadow: '0 8px 32px rgba(0,0,0,0.15)' }}
             onClick={e => e.stopPropagation()}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-              <div style={{ fontWeight: 500, fontSize: 15 }}>Removal email — {emailModal.name}</div>
-              <button onClick={() => setEmailModal(null)} style={{ background: 'none', border: 'none', fontSize: 18, cursor: 'pointer', color: '#6b6b67' }}>✕</button>
+              <div style={{ fontWeight: 500, fontSize: 15 }}>Removal email for {emailModal.name}</div>
+              <button onClick={() => setEmailModal(null)} style={{ background: 'none', border: 'none', fontSize: 18, cursor: 'pointer', color: '#6b6b67' }}>x</button>
             </div>
             <div style={{ fontSize: 12, color: '#6b6b67', marginBottom: 6 }}>Subject: Personal Data Removal Request — {userInfo.name}</div>
             <textarea readOnly value={generateEmail(emailModal)}
-              style={{ width: '100%', height: 220, padding: 12, borderRadius: 8, border: '0.5px solid rgba(0,0,0,0.12)', fontSize: 12, fontFamily: 'monospace', resize: 'none', color: '#1a1a18' }}
+              style={{ width: '100%', height: 220, padding: 12, borderRadius: 8, border: '0.5px solid rgba(0,0,0,0.12)', fontSize: 12, fontFamily: 'monospace', resize: 'none', color: '#1a1a18', boxSizing: 'border-box' }}
             />
             <div style={{ display: 'flex', gap: 8, marginTop: 12 }}>
               <button onClick={() => navigator.clipboard.writeText(generateEmail(emailModal))}
@@ -146,7 +144,6 @@ ${userInfo.name}`
         </div>
       )}
 
-      {/* Progress */}
       <div style={{ background: '#fff', border: '0.5px solid rgba(0,0,0,0.1)', borderRadius: 12, padding: '16px 20px', marginBottom: 24 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, marginBottom: 8 }}>
           <span style={{ fontWeight: 500 }}>{done} of {brokers.length} complete</span>
@@ -157,7 +154,6 @@ ${userInfo.name}`
         </div>
       </div>
 
-      {/* Broker list */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
         {brokers.map(b => (
           <div key={b.id} style={{ background: '#fff', border: `0.5px solid ${completed[b.id] ? '#97C459' : 'rgba(0,0,0,0.1)'}`, borderRadius: 12, overflow: 'hidden' }}>
@@ -175,7 +171,7 @@ ${userInfo.name}`
               <span style={{ fontSize: 11, fontWeight: 500, padding: '3px 9px', borderRadius: 20, background: riskColors[b.risk].bg, color: riskColors[b.risk].color }}>
                 {b.risk}
               </span>
-              <span style={{ fontSize: 12, color: '#9e9e9a' }}>{expanded === b.id ? '▲' : '▼'}</span>
+              <span style={{ fontSize: 12, color: '#9e9e9a' }}>{expanded === b.id ? 'v' : '>'}</span>
             </div>
 
             {expanded === b.id && (
@@ -188,7 +184,7 @@ ${userInfo.name}`
                 <div style={{ display: 'flex', gap: 8 }}>
                   <button onClick={() => window.open(b.url, '_blank')}
                     style={{ padding: '8px 16px', borderRadius: 8, background: '#1a1a18', color: '#fff', border: 'none', fontSize: 13, fontWeight: 500, cursor: 'pointer' }}>
-                    Open opt-out page ↗
+                    Open opt-out page
                   </button>
                   {userInfo.name && userInfo.email && (
                     <button onClick={() => setEmailModal(b)}
@@ -202,6 +198,8 @@ ${userInfo.name}`
           </div>
         ))}
       </div>
+
+      <Footer />
     </div>
   )
 }

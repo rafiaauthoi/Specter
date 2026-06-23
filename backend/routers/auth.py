@@ -1,14 +1,66 @@
-from fastapi import APIRouter, HTTPException, Query
+from fastapi import APIRouter, HTTPException, Query, Depends
 from fastapi.responses import RedirectResponse
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from core.config import settings
 from core.database import SessionLocal
 from core.security import encrypt_token
-import os
-import sqlalchemy
 import requests
 import urllib.parse
+import sqlalchemy
+from supabase import create_client
 
 router = APIRouter()
+security = HTTPBearer()
+
+supabase = create_client(settings.SUPABASE_URL, settings.SUPABASE_SERVICE_KEY)
+
+# ─── Supabase email/password auth ───────────────────────────────────────────
+
+@router.post("/signup")
+def signup(email: str, password: str):
+    try:
+        res = supabase.auth.sign_up({"email": email, "password": password})
+        if res.user is None:
+            raise HTTPException(400, "Signup failed")
+        return {"user_id": res.user.id, "email": res.user.email}
+    except Exception as e:
+        raise HTTPException(400, str(e))
+
+@router.post("/login")
+def login(email: str, password: str):
+    try:
+        res = supabase.auth.sign_in_with_password({"email": email, "password": password})
+        if res.session is None:
+            raise HTTPException(401, "Invalid credentials")
+        return {
+            "access_token": res.session.access_token,
+            "user_id": res.user.id,
+            "email": res.user.email
+        }
+    except Exception as e:
+        raise HTTPException(401, str(e))
+
+@router.post("/logout")
+def logout(credentials: HTTPAuthorizationCredentials = Depends(security)):
+    try:
+        supabase.auth.sign_out()
+        return {"ok": True}
+    except Exception:
+        return {"ok": True}
+
+# ─── Token verification dependency ──────────────────────────────────────────
+
+def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(security)) -> str:
+    try:
+        token = credentials.credentials
+        user = supabase.auth.get_user(token)
+        if user is None or user.user is None:
+            raise HTTPException(401, "Invalid or expired token")
+        return user.user.id
+    except Exception:
+        raise HTTPException(401, "Invalid or expired token")
+
+# ─── Google OAuth ────────────────────────────────────────────────────────────
 
 SCOPES = " ".join([
     "openid",

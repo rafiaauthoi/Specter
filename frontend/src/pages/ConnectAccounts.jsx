@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom'
+import Footer from '../components/Footer'
 
 const GoogleIcon = () => (
   <svg width="20" height="20" viewBox="0 0 24 24">
@@ -36,7 +37,7 @@ export default function ConnectAccounts() {
     <div style={{ maxWidth: 760, margin: '0 auto', padding: '32px 24px', fontFamily: 'system-ui, sans-serif' }}>
       <button onClick={() => navigate('/dashboard')}
         style={{ background: 'none', border: 'none', color: '#6b6b67', fontSize: 13, cursor: 'pointer', marginBottom: 24, padding: 0 }}>
-        ← Back to dashboard
+        Back to dashboard
       </button>
 
       <h1 style={{ fontSize: 20, fontWeight: 500, margin: '0 0 6px' }}>Connect accounts</h1>
@@ -63,7 +64,7 @@ export default function ConnectAccounts() {
                 </div>
               </div>
               <button
-                onClick={() => window.location.href = `http://localhost:8000/auth/${p.id}?user_id=demo-user`}
+                onClick={() => window.location.href = `http://localhost:8000/auth/${p.id}?user_id=${localStorage.getItem('user_id') || 'demo-user'}`}
                 style={{ padding: '8px 18px', borderRadius: 8, background: '#1a1a18', color: '#fff', border: 'none', fontSize: 13, fontWeight: 500, cursor: 'pointer', flexShrink: 0 }}>
                 Connect
               </button>
@@ -73,12 +74,14 @@ export default function ConnectAccounts() {
       </div>
 
       <div style={{ marginTop: 24, padding: '16px 20px', background: '#f5f4f0', borderRadius: 12, fontSize: 13, color: '#6b6b67' }}>
-        <strong style={{ color: '#1a1a18' }}>Data brokers</strong> don't have APIs, so we guide you through removing yourself manually.
+        <strong style={{ color: '#1a1a18' }}>Data brokers</strong> do not have APIs, so we guide you through removing yourself manually.
         <button onClick={() => navigate('/removal')}
           style={{ marginLeft: 8, background: 'none', border: 'none', color: '#534AB7', fontSize: 13, cursor: 'pointer', fontWeight: 500 }}>
-          Go to guided removal →
+          Go to guided removal
         </button>
       </div>
+
+      <Footer />
     </div>
   )
 }

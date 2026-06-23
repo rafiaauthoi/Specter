@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
+import Footer from '../components/Footer'
 
-const USER_ID = 'demo-user'
+const USER_ID = localStorage.getItem('user_id') || 'demo-user'
 const API_URL = 'http://localhost:8000'
 
 const riskColors = {
@@ -41,32 +42,30 @@ export default function Dashboard() {
       const data = await resp.json()
       setScanResults(data)
       setScore(Math.min(100, 30 + data.newsletters_found * 2))
-      showToast(`Scan complete — found ${data.newsletters_found} newsletter senders`)
+      showToast(`Scan complete. Found ${data.newsletters_found} newsletter senders.`)
     } catch (e) {
-      showToast('Scan failed — try again')
+      showToast('Scan failed. Try again.')
     } finally {
       setScanning(false)
     }
   }
 
   const platforms = [
-    { id: 'google',  label: 'Google activity & Gmail',  desc: scanResults ? `${scanResults.newsletters_found} newsletter senders found` : connected.google ? 'Connected - click Scan now' : 'Connect to scan', risk: 'medium', isConnected: connected.google },
-    { id: 'twitter', label: 'Twitter / X posts',        desc: 'Tweets, likes, replies',              risk: 'high',   isConnected: false },
-    { id: 'reddit',  label: 'Reddit posts & comments',  desc: 'Posts and comments by subreddit',     risk: 'medium', isConnected: false },
-    { id: 'brokers', label: 'Data brokers',             desc: 'Spokeo, Whitepages, and 18 others',   risk: 'medium', isConnected: false },
+    { id: 'google',  label: 'Google activity & Gmail', desc: scanResults ? `${scanResults.newsletters_found} newsletter senders found` : connected.google ? 'Connected. Click Scan now.' : 'Connect to scan', risk: 'high', isConnected: connected.google },
+    { id: 'twitter', label: 'Twitter / X posts',        desc: 'Tweets, likes, replies',            risk: 'high',   isConnected: false },
+    { id: 'reddit',  label: 'Reddit posts & comments',  desc: 'Posts and comments by subreddit',   risk: 'medium', isConnected: false },
+    { id: 'brokers', label: 'Data brokers',             desc: 'Spokeo, Whitepages, and 18 others', risk: 'medium', isConnected: false },
   ]
 
   return (
     <div style={{ maxWidth: 760, margin: '0 auto', padding: '32px 24px', fontFamily: 'system-ui, sans-serif' }}>
 
-      {/* Toast */}
       {toast && (
         <div style={{ position: 'fixed', top: 20, right: 20, background: '#1a1a18', color: '#fff', padding: '10px 18px', borderRadius: 10, fontSize: 13, zIndex: 999 }}>
           {toast}
         </div>
       )}
 
-      {/* Header */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
         <div>
           <div style={{ fontSize: 13, fontWeight: 500, letterSpacing: '-0.01em', marginBottom: 16, color: '#888' }}>clearprint</div>
@@ -85,7 +84,6 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* Exposure score */}
       <div style={{ background: '#fff', border: '0.5px solid rgba(0,0,0,0.1)', borderRadius: 12, padding: '20px 24px', display: 'flex', alignItems: 'center', gap: 20, marginBottom: 24 }}>
         <svg width="64" height="64" viewBox="0 0 64 64">
           <circle cx="32" cy="32" r="28" fill="none" stroke="#f0efeb" strokeWidth="6"/>
@@ -97,15 +95,14 @@ export default function Dashboard() {
         <div>
           <div style={{ fontSize: 16, fontWeight: 500 }}>Exposure score</div>
           <div style={{ fontSize: 13, color: '#6b6b67', marginTop: 2 }}>
-            {score > 60 ? 'High exposure' : score > 30 ? 'Medium exposure' : 'Looking good'}. {connected.google ? 'Scan to update.' : 'Connect accounts to start cleaning.'}
+            {score > 60 ? 'High exposure.' : score > 30 ? 'Medium exposure.' : 'Looking good.'} {connected.google ? 'Scan to update.' : 'Connect accounts to start cleaning.'}
           </div>
         </div>
       </div>
 
-      {/* Metrics */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 10, marginBottom: 24 }}>
         {[
-          { label: 'Newsletters found', value: scanResults?.newsletters_found ?? '—', sub: 'from Gmail scan' },
+          { label: 'Newsletters found', value: scanResults?.newsletters_found ?? '--', sub: 'from Gmail scan' },
           { label: 'Items deleted',     value: '0',                                    sub: 'this session' },
           { label: 'Est. time saved',   value: scanResults ? `${Math.round(scanResults.newsletters_found * 0.5)}m` : '0m', sub: 'vs. manual' },
         ].map(m => (
@@ -117,7 +114,6 @@ export default function Dashboard() {
         ))}
       </div>
 
-      {/* Platform cards */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 24 }}>
         {platforms.map(p => (
           <div key={p.id}
@@ -139,7 +135,6 @@ export default function Dashboard() {
         ))}
       </div>
 
-      {/* Scan results */}
       {scanResults && scanResults.senders.length > 0 && (
         <div>
           <h2 style={{ fontSize: 15, fontWeight: 500, marginBottom: 12 }}>Newsletter senders found</h2>
@@ -156,6 +151,8 @@ export default function Dashboard() {
           </div>
         </div>
       )}
+
+      <Footer />
     </div>
   )
 }
