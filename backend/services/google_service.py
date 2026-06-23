@@ -92,3 +92,55 @@ def scan_gmail(user_id: str) -> dict:
     db.close()
 
     return {"newsletters_found": len(senders), "senders": list(senders.values())}
+
+def delete_sender_emails(user_id: str, sender_email: str) -> dict:
+    token = get_access_token(user_id)
+    headers = {"Authorization": f"Bearer {token}"}
+
+    # Search for all emails from this sender
+    resp = requests.get(
+        "https://gmail.googleapis.com/gmail/v1/users/me/messages",
+        headers=headers,
+        params={"q": f"from:{sender_email}", "maxResults": 100}
+    )
+
+    if resp.status_code != 200:
+        raise Exception(f"Gmail API error: {resp.text}")
+
+    messages = resp.json().get("messages", [])
+
+    if not messages:
+        return {"deleted": 0}
+
+    # Batch trash all messages
+    message_ids = [m["id"] for m in messages]
+
+    batch_resp = requests.post(
+        "https://gmail.googleapis.com/gmail/v1/users/me/messages/batchModify",
+        headers={**headers, "Content-Type": "application/json"},
+        json={
+            "ids": message_ids,
+            "addLabelIds": ["TRASH"],
+            "removeLabelIds": ["INBOX"]
+        }
+    )
+
+    if batch_resp.status_code not in (200, 204):
+        raise Exception(f"Batch delete failed: {batch_resp.text}")
+
+    # Mark as deleted in scan_results
+    db = SessionLocal()
+    db.execute(
+        sqlalchemy.text("""
+            UPDATE scan_results
+            SET deleted_at = NOW()
+            WHERE user_id = :user_id
+            AND platform = 'google'
+            AND metadata->>'from' LIKE :sender
+        """),
+        {"user_id": user_id, "sender": f"%{sender_email}%"}
+    )
+    db.commit()
+    db.close()
+
+    return {"deleted": len(message_ids)}

@@ -18,6 +18,9 @@ export default function Dashboard() {
   const [scanResults, setScanResults] = useState(null)
   const [connected, setConnected] = useState({ google: false })
   const [toast, setToast] = useState(null)
+  const [deleting, setDeleting] = useState({})
+  const [deleted, setDeleted] = useState({})
+  const [totalDeleted, setTotalDeleted] = useState(0)
 
   useEffect(() => {
     if (searchParams.get('connected') === 'google') {
@@ -47,6 +50,8 @@ export default function Dashboard() {
     try {
       const resp = await fetch(`${API_URL}/google/scan?user_id=${USER_ID}`)
       const data = await resp.json()
+      if (!resp.ok) throw new Error(data.detail || 'Scan failed')
+      if (!data.senders) throw new Error('Unexpected response from server')
       setScanResults(data)
       setScore(Math.min(100, 30 + data.newsletters_found * 2))
       showToast(`Scan complete. Found ${data.newsletters_found} newsletter senders.`)
@@ -54,6 +59,27 @@ export default function Dashboard() {
       showToast('Scan failed. Try again.')
     } finally {
       setScanning(false)
+    }
+  }
+
+  async function deleteSender(sender) {
+    const senderEmail = sender.from.match(/<(.+)>/) ? sender.from.match(/<(.+)>/)[1] : sender.from
+    setDeleting(p => ({ ...p, [senderEmail]: true }))
+    try {
+      const resp = await fetch(
+        `${API_URL}/google/delete-sender?user_id=${USER_ID}&sender_email=${encodeURIComponent(senderEmail)}`,
+        { method: 'DELETE' }
+      )
+      const data = await resp.json()
+      if (!resp.ok) throw new Error(data.detail || 'Delete failed')
+      setDeleted(p => ({ ...p, [senderEmail]: true }))
+      setTotalDeleted(n => n + (data.deleted || 0))
+      setScore(s => Math.max(0, s - 3))
+      showToast(`Deleted ${data.deleted} emails from ${senderEmail}.`)
+    } catch (e) {
+      showToast('Delete failed. Try again.')
+    } finally {
+      setDeleting(p => ({ ...p, [senderEmail]: false }))
     }
   }
 
@@ -119,8 +145,8 @@ export default function Dashboard() {
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 10, marginBottom: 24 }}>
           {[
             { label: 'Newsletters found', value: scanResults?.newsletters_found ?? '--', sub: 'from Gmail scan' },
-            { label: 'Items deleted',     value: '0',                                    sub: 'this session' },
-            { label: 'Est. time saved',   value: scanResults ? `${Math.round(scanResults.newsletters_found * 0.5)}m` : '0m', sub: 'vs. manual' },
+            { label: 'Items deleted',     value: totalDeleted,                           sub: 'this session' },
+            { label: 'Est. time saved',   value: totalDeleted > 0 ? `${Math.round(totalDeleted * 0.1)}m` : '0m', sub: 'vs. manual' },
           ].map(m => (
             <div key={m.label} style={{ background: '#fff', border: '0.5px solid rgba(0,0,0,0.1)', borderRadius: 10, padding: '14px 16px' }}>
               <div style={{ fontSize: 12, color: '#6b6b67', marginBottom: 4 }}>{m.label}</div>
@@ -157,15 +183,32 @@ export default function Dashboard() {
           <div>
             <h2 style={{ fontSize: 15, fontWeight: 500, marginBottom: 12 }}>Newsletter senders found</h2>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-              {scanResults.senders.map((s, i) => (
-                <div key={i} style={{ background: '#fff', border: '0.5px solid rgba(0,0,0,0.08)', borderRadius: 10, padding: '12px 14px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <div>
-                    <div style={{ fontSize: 13, fontWeight: 500, color: '#1a1a18' }}>{s.from.replace(/<.*>/, '').trim()}</div>
-                    <div style={{ fontSize: 11, color: '#9e9e9a', marginTop: 2 }}>{s.subject?.slice(0, 60)}</div>
+              {scanResults.senders.map((s, i) => {
+                const senderEmail = s.from.match(/<(.+)>/) ? s.from.match(/<(.+)>/)[1] : s.from
+                const isDone = deleted[senderEmail]
+                const isDeleting = deleting[senderEmail]
+                return (
+                  <div key={i} style={{ background: '#fff', border: `0.5px solid ${isDone ? '#97C459' : 'rgba(0,0,0,0.08)'}`, borderRadius: 10, padding: '12px 14px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', opacity: isDone ? 0.6 : 1 }}>
+                    <div>
+                      <div style={{ fontSize: 13, fontWeight: 500, color: '#1a1a18', textDecoration: isDone ? 'line-through' : 'none' }}>{s.from.replace(/<.*>/, '').trim()}</div>
+                      <div style={{ fontSize: 11, color: '#9e9e9a', marginTop: 2 }}>{s.subject?.slice(0, 60)}</div>
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0, marginLeft: 12 }}>
+                      <span style={{ fontSize: 11, color: '#6b6b67' }}>{s.count} emails</span>
+                      {isDone ? (
+                        <span style={{ fontSize: 11, color: '#639922', fontWeight: 500 }}>Deleted</span>
+                      ) : (
+                        <button
+                          onClick={() => deleteSender(s)}
+                          disabled={isDeleting}
+                          style={{ padding: '5px 12px', borderRadius: 7, background: '#FCEBEB', color: '#791F1F', border: 'none', fontSize: 12, fontWeight: 500, cursor: 'pointer', opacity: isDeleting ? 0.6 : 1 }}>
+                          {isDeleting ? 'Deleting...' : 'Delete all'}
+                        </button>
+                      )}
+                    </div>
                   </div>
-                  <span style={{ fontSize: 11, color: '#6b6b67', flexShrink: 0, marginLeft: 12 }}>{s.count} emails</span>
-                </div>
-              ))}
+                )
+              })}
             </div>
           </div>
         )}
