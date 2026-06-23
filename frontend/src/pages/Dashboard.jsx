@@ -15,8 +15,14 @@ export default function Dashboard() {
   const [searchParams] = useSearchParams()
   const [score, setScore] = useState(74)
   const [scanning, setScanning] = useState(false)
-  const [scanResults, setScanResults] = useState(null)
-  const [connected, setConnected] = useState({ google: false })
+  const [scanResults, setScanResults] = useState(() => {
+    const saved = localStorage.getItem('scan_results')
+    return saved ? JSON.parse(saved) : null
+  })
+  const [connected, setConnected] = useState(() => {
+    const saved = localStorage.getItem('connected_accounts')
+    return saved ? JSON.parse(saved) : { google: false }
+  })
   const [toast, setToast] = useState(null)
   const [deleting, setDeleting] = useState({})
   const [deleted, setDeleted] = useState({})
@@ -24,10 +30,18 @@ export default function Dashboard() {
 
   useEffect(() => {
     if (searchParams.get('connected') === 'google') {
-      setConnected(p => ({ ...p, google: true }))
+      const updated = { ...connected, google: true }
+      setConnected(updated)
+      localStorage.setItem('connected_accounts', JSON.stringify(updated))
       showToast('Google connected successfully!')
     }
   }, [searchParams])
+
+  useEffect(() => {
+    if (scanResults) {
+      setScore(Math.min(100, 30 + scanResults.newsletters_found * 2))
+    }
+  }, [])
 
   function showToast(msg) {
     setToast(msg)
@@ -38,6 +52,8 @@ export default function Dashboard() {
     localStorage.removeItem('access_token')
     localStorage.removeItem('user_id')
     localStorage.removeItem('cookie_consent')
+    localStorage.removeItem('scan_results')
+    localStorage.removeItem('connected_accounts')
     window.location.href = '/login'
   }
 
@@ -53,6 +69,7 @@ export default function Dashboard() {
       if (!resp.ok) throw new Error(data.detail || 'Scan failed')
       if (!data.senders) throw new Error('Unexpected response from server')
       setScanResults(data)
+      localStorage.setItem('scan_results', JSON.stringify(data))
       setScore(Math.min(100, 30 + data.newsletters_found * 2))
       showToast(`Scan complete. Found ${data.newsletters_found} newsletter senders.`)
     } catch (e) {
