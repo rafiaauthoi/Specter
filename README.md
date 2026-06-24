@@ -73,23 +73,17 @@ pip install -r requirements.txt
 
 Create a `backend/.env` file with these variables:
 
+```bash
 DATABASE_URL=your_supabase_postgres_connection_string
-
 SECRET_KEY=your_secret_key
-
 GOOGLE_CLIENT_ID=your_google_client_id
-
 GOOGLE_CLIENT_SECRET=your_google_client_secret
-
 GOOGLE_REDIRECT_URI=http://localhost:8000/auth/google/callback
-
 SUPABASE_URL=your_supabase_project_url
-
 SUPABASE_ANON_KEY=your_supabase_anon_key
-
 SUPABASE_SERVICE_KEY=your_supabase_service_key
-
 FRONTEND_URL=http://localhost:5173
+```
 
 Then run:
 ```bash
@@ -113,26 +107,17 @@ Open http://localhost:5173
 Specter/
 
 ├── backend/
-
 │   ├── core/          # Config, database, encryption
-
 │   ├── routers/       # Auth and Google API routes
-
 │   ├── services/      # Gmail scan and delete logic
-
 │   ├── main.py
-
 │   └── setup_db.py
-
 └── frontend/
-
 └── src/
-
 ├── components/  # Footer, CookieBanner
-
 └── pages/       # Dashboard, Login, ConnectAccounts,
 
-# GuidedRemoval, policy pages
+# GuidedRemoval, Policy Pages
 
 ---
 
@@ -145,4 +130,4 @@ This project includes a Privacy Policy, Terms of Service, Cookie Policy, and Sec
 ## Author
 
 Rafia Authoi | Computer Information Systems, Western Michigan University  
-Minors: Cybersecurity, UX/UI, General Business
+Minors: Cybersecurity | UX/UI | General Business
