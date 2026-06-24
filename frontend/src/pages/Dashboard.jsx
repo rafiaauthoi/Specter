@@ -5,11 +5,6 @@ import Footer from '../components/Footer'
 const USER_ID = localStorage.getItem('user_id') || 'demo-user'
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000'
 
-const riskColors = {
-  high:   { bg: '#FCEBEB', color: '#791F1F' },
-  medium: { bg: '#FAEEDA', color: '#633806' },
-}
-
 export default function Dashboard() {
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
@@ -33,7 +28,7 @@ export default function Dashboard() {
       const updated = { ...connected, google: true }
       setConnected(updated)
       localStorage.setItem('connected_accounts', JSON.stringify(updated))
-      showToast('Google connected successfully!')
+      showToast('Google connected.')
     }
   }, [searchParams])
 
@@ -71,7 +66,7 @@ export default function Dashboard() {
       setScanResults(data)
       localStorage.setItem('scan_results', JSON.stringify(data))
       setScore(Math.min(100, 30 + data.newsletters_found * 2))
-      showToast(`Scan complete. Found ${data.newsletters_found} newsletter senders.`)
+      showToast(`Scan complete. Found ${data.newsletters_found} senders.`)
     } catch (e) {
       showToast('Scan failed. Try again.')
     } finally {
@@ -100,60 +95,86 @@ export default function Dashboard() {
     }
   }
 
+  const scoreColor = score > 60 ? 'var(--red)' : score > 30 ? 'var(--orange)' : 'var(--green)'
+  const scoreLabel = score > 60 ? 'High exposure' : score > 30 ? 'Medium exposure' : 'Looking good'
+
   const platforms = [
-    { id: 'google',  label: 'Google activity & Gmail', desc: scanResults ? `${scanResults.newsletters_found} newsletter senders found` : connected.google ? 'Connected. Click Scan now.' : 'Connect to scan', risk: 'high', isConnected: connected.google },
-    { id: 'twitter', label: 'Twitter / X posts',        desc: 'Tweets, likes, replies',            risk: 'high',   isConnected: false },
-    { id: 'reddit',  label: 'Reddit posts & comments',  desc: 'Posts and comments by subreddit',   risk: 'medium', isConnected: false },
-    { id: 'brokers', label: 'Data brokers',             desc: 'Spokeo, Whitepages, and 18 others', risk: 'medium', isConnected: false },
+    {
+      id: 'google', label: 'Google / Gmail',
+      desc: scanResults ? `${scanResults.newsletters_found} senders found` : connected.google ? 'Connected. Run a scan.' : 'Connect to scan.',
+      risk: 'high', isConnected: connected.google
+    },
+    { id: 'twitter', label: 'Twitter / X', desc: 'Tweets, likes, replies', risk: 'high', isConnected: false },
+    { id: 'reddit', label: 'Reddit', desc: 'Posts and comments', risk: 'medium', isConnected: false },
+    { id: 'brokers', label: 'Data brokers', desc: 'Spokeo, Whitepages, and 18 others', risk: 'medium', isConnected: false },
   ]
 
   return (
-    <div style={{ fontFamily: 'system-ui, sans-serif', minHeight: '100vh', background: '#fafaf9' }}>
+    <div style={{ minHeight: '100vh', background: 'var(--bg)' }}>
 
       {toast && (
-        <div style={{ position: 'fixed', top: 20, right: 20, background: '#1a1a18', color: '#fff', padding: '10px 18px', borderRadius: 10, fontSize: 13, zIndex: 999 }}>
+        <div style={{
+          position: 'fixed', top: 20, right: 20, zIndex: 998,
+          background: 'var(--surface)', border: '1px solid var(--border-active)',
+          color: 'var(--pink)', padding: '10px 18px', borderRadius: 'var(--radius)',
+          fontSize: 12, fontFamily: 'var(--font-body)',
+          boxShadow: '0 0 16px var(--pink-glow)'
+        }}>
           {toast}
         </div>
       )}
 
-      {/* Top nav */}
-      <div style={{ borderBottom: '0.5px solid rgba(0,0,0,0.08)', padding: '0 24px', height: 48, display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: '#fff' }}>
-        <div style={{ fontSize: 13, fontWeight: 500, letterSpacing: '-0.01em', color: '#1a1a18' }}>clearprint</div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          <button onClick={runScan} disabled={scanning}
-            style={{ padding: '6px 14px', borderRadius: 7, background: 'transparent', color: '#1a1a18', border: '0.5px solid rgba(0,0,0,0.15)', fontSize: 12, fontWeight: 500, cursor: 'pointer', opacity: scanning ? 0.6 : 1 }}>
+      {/* Navbar */}
+      <nav className="navbar">
+        <span className="navbar-logo">clearprint</span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          <button className="btn-ghost" onClick={runScan} disabled={scanning}
+            style={{ opacity: scanning ? 0.6 : 1, fontSize: 11 }}>
             {scanning ? 'Scanning...' : 'Scan now'}
           </button>
-          <button onClick={() => navigate('/connect')}
-            style={{ padding: '6px 14px', borderRadius: 7, background: '#1a1a18', color: '#fff', border: 'none', fontSize: 12, fontWeight: 500, cursor: 'pointer' }}>
-            Connect accounts
+          <button className="btn-primary" onClick={() => navigate('/connect')}
+            style={{ fontSize: 11 }}>
+            Connect
           </button>
           <button onClick={handleSignOut}
-            style={{ background: 'none', border: 'none', color: '#9e9e9a', fontSize: 12, cursor: 'pointer', padding: '6px 0' }}>
+            style={{ background: 'none', border: 'none', color: 'var(--text-muted)', fontSize: 11, cursor: 'pointer', fontFamily: 'var(--font-body)' }}>
             Sign out
           </button>
         </div>
-      </div>
+      </nav>
 
-      {/* Page content */}
-      <div style={{ maxWidth: 760, margin: '0 auto', padding: '32px 24px' }}>
+      <div className="page">
 
-        <h1 style={{ fontSize: 20, fontWeight: 500, margin: '0 0 4px' }}>Your footprint</h1>
-        <p style={{ fontSize: 13, color: '#6b6b67', margin: '0 0 24px' }}>Connect accounts to scan and clean</p>
+        <div style={{ marginBottom: 28 }}>
+          <h1 className="section-title">Your Footprint</h1>
+          <p className="section-sub">Connect accounts to scan and clean your digital trail</p>
+        </div>
 
         {/* Exposure score */}
-        <div style={{ background: '#fff', border: '0.5px solid rgba(0,0,0,0.1)', borderRadius: 12, padding: '20px 24px', display: 'flex', alignItems: 'center', gap: 20, marginBottom: 24 }}>
-          <svg width="64" height="64" viewBox="0 0 64 64">
-            <circle cx="32" cy="32" r="28" fill="none" stroke="#f0efeb" strokeWidth="6"/>
-            <circle cx="32" cy="32" r="28" fill="none" stroke="#E24B4A" strokeWidth="6"
-              strokeDasharray={`${(score/100)*175.9} 175.9`}
-              strokeLinecap="round" transform="rotate(-90 32 32)"/>
-            <text x="32" y="37" textAnchor="middle" fontSize="14" fontWeight="500" fill="#E24B4A">{score}</text>
-          </svg>
+        <div className="card" style={{
+          display: 'flex', alignItems: 'center', gap: 24, marginBottom: 16,
+          animation: 'glow-pulse 4s ease-in-out infinite'
+        }}>
+          <div style={{ position: 'relative', flexShrink: 0 }}>
+            <svg width="80" height="80" viewBox="0 0 80 80">
+              <circle cx="40" cy="40" r="34" fill="none" stroke="var(--surface-2)" strokeWidth="6"/>
+              <circle cx="40" cy="40" r="34" fill="none" stroke={scoreColor} strokeWidth="6"
+                strokeDasharray={`${(score/100)*213.6} 213.6`}
+                strokeLinecap="round" transform="rotate(-90 40 40)"
+                style={{ filter: `drop-shadow(0 0 6px ${scoreColor})`, transition: 'stroke-dasharray 0.6s ease' }}/>
+              <text x="40" y="45" textAnchor="middle" fontSize="16" fontWeight="600" fill={scoreColor}
+                fontFamily="var(--font-body)">{score}</text>
+            </svg>
+          </div>
           <div>
-            <div style={{ fontSize: 16, fontWeight: 500 }}>Exposure score</div>
-            <div style={{ fontSize: 13, color: '#6b6b67', marginTop: 2 }}>
-              {score > 60 ? 'High exposure.' : score > 30 ? 'Medium exposure.' : 'Looking good.'} {connected.google ? 'Scan to update.' : 'Connect accounts to start cleaning.'}
+            <div style={{ fontSize: 15, fontWeight: 600, color: 'var(--text)', marginBottom: 4 }}>
+              Exposure Score
+            </div>
+            <div style={{ fontSize: 12, color: scoreColor, fontWeight: 500, marginBottom: 4 }}>
+              {scoreLabel}
+            </div>
+            <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>
+              {connected.google ? 'Run a scan to update' : 'Connect an account to get started'}
             </div>
           </div>
         </div>
@@ -161,35 +182,46 @@ export default function Dashboard() {
         {/* Metrics */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 10, marginBottom: 24 }}>
           {[
-            { label: 'Newsletters found', value: scanResults?.newsletters_found ?? '--', sub: 'from Gmail scan' },
-            { label: 'Items deleted',     value: totalDeleted,                           sub: 'this session' },
-            { label: 'Est. time saved',   value: totalDeleted > 0 ? `${Math.round(totalDeleted * 0.1)}m` : '0m', sub: 'vs. manual' },
+            { label: 'Newsletters found', value: scanResults?.newsletters_found ?? '--', sub: 'from Gmail' },
+            { label: 'Emails deleted',    value: totalDeleted,                           sub: 'this session' },
+            { label: 'Time saved',        value: totalDeleted > 0 ? `${Math.round(totalDeleted * 0.1)}m` : '0m', sub: 'vs. manual' },
           ].map(m => (
-            <div key={m.label} style={{ background: '#fff', border: '0.5px solid rgba(0,0,0,0.1)', borderRadius: 10, padding: '14px 16px' }}>
-              <div style={{ fontSize: 12, color: '#6b6b67', marginBottom: 4 }}>{m.label}</div>
-              <div style={{ fontSize: 22, fontWeight: 500 }}>{m.value}</div>
-              <div style={{ fontSize: 11, color: '#9e9e9a', marginTop: 2 }}>{m.sub}</div>
+            <div key={m.label} className="card" style={{ padding: '14px 16px' }}>
+              <div style={{ fontSize: 10, color: 'var(--text-muted)', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.08em' }}>{m.label}</div>
+              <div style={{ fontSize: 24, fontWeight: 600, color: 'var(--pink)', marginBottom: 2 }}>{m.value}</div>
+              <div style={{ fontSize: 10, color: 'var(--text-dim)' }}>{m.sub}</div>
             </div>
           ))}
         </div>
 
         {/* Platform cards */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 24 }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 28 }}>
           {platforms.map(p => (
             <div key={p.id}
               onClick={() => p.id === 'brokers' ? navigate('/removal') : p.id === 'google' && !p.isConnected ? navigate('/connect') : null}
-              style={{ background: '#fff', border: `0.5px solid ${p.isConnected ? '#97C459' : 'rgba(0,0,0,0.1)'}`, borderRadius: 12, padding: '14px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer', transition: 'border-color .15s' }}
-              onMouseEnter={e => e.currentTarget.style.borderColor = p.isConnected ? '#7aad3d' : 'rgba(0,0,0,0.25)'}
-              onMouseLeave={e => e.currentTarget.style.borderColor = p.isConnected ? '#97C459' : 'rgba(0,0,0,0.1)'}>
+              style={{
+                background: 'var(--surface)', border: `1px solid ${p.isConnected ? 'rgba(57,255,138,0.3)' : 'var(--border)'}`,
+                borderRadius: 'var(--radius-lg)', padding: '14px 18px',
+                display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                cursor: 'pointer', transition: 'border-color 0.2s, box-shadow 0.2s'
+              }}
+              onMouseEnter={e => {
+                e.currentTarget.style.borderColor = p.isConnected ? 'rgba(57,255,138,0.6)' : 'var(--border-active)'
+                e.currentTarget.style.boxShadow = '0 0 12px var(--pink-glow)'
+              }}
+              onMouseLeave={e => {
+                e.currentTarget.style.borderColor = p.isConnected ? 'rgba(57,255,138,0.3)' : 'var(--border)'
+                e.currentTarget.style.boxShadow = 'none'
+              }}>
               <div>
-                <div style={{ fontWeight: 500, fontSize: 14 }}>{p.label}</div>
-                <div style={{ fontSize: 12, color: '#6b6b67', marginTop: 2 }}>{p.desc}</div>
+                <div style={{ fontSize: 13, fontWeight: 500, color: 'var(--text)', marginBottom: 2 }}>{p.label}</div>
+                <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>{p.desc}</div>
               </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                {p.isConnected && <span style={{ fontSize: 11, color: '#639922' }}>Connected</span>}
-                <span style={{ fontSize: 11, fontWeight: 500, padding: '3px 9px', borderRadius: 20, background: riskColors[p.risk].bg, color: riskColors[p.risk].color }}>
-                  {p.risk === 'high' ? 'High risk' : 'Medium risk'}
-                </span>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
+                {p.isConnected && (
+                  <span style={{ fontSize: 10, color: 'var(--green)', fontWeight: 600, letterSpacing: '0.05em' }}>CONNECTED</span>
+                )}
+                <span className={`badge-${p.risk}`}>{p.risk}</span>
               </div>
             </div>
           ))}
@@ -198,28 +230,45 @@ export default function Dashboard() {
         {/* Scan results */}
         {scanResults && scanResults.senders.length > 0 && (
           <div>
-            <h2 style={{ fontSize: 15, fontWeight: 500, marginBottom: 12 }}>Newsletter senders found</h2>
+            <div style={{ fontSize: 11, color: 'var(--pink)', fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 12 }}>
+              Newsletter Senders Found
+            </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
               {scanResults.senders.map((s, i) => {
                 const senderEmail = s.from.match(/<(.+)>/) ? s.from.match(/<(.+)>/)[1] : s.from
                 const isDone = deleted[senderEmail]
                 const isDeleting = deleting[senderEmail]
                 return (
-                  <div key={i} style={{ background: '#fff', border: `0.5px solid ${isDone ? '#97C459' : 'rgba(0,0,0,0.08)'}`, borderRadius: 10, padding: '12px 14px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', opacity: isDone ? 0.6 : 1 }}>
+                  <div key={i} style={{
+                    background: 'var(--surface)',
+                    border: `1px solid ${isDone ? 'rgba(57,255,138,0.3)' : 'var(--border)'}`,
+                    borderRadius: 'var(--radius)', padding: '11px 14px',
+                    display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                    opacity: isDone ? 0.5 : 1, transition: 'opacity 0.3s'
+                  }}>
                     <div>
-                      <div style={{ fontSize: 13, fontWeight: 500, color: '#1a1a18', textDecoration: isDone ? 'line-through' : 'none' }}>{s.from.replace(/<.*>/, '').trim()}</div>
-                      <div style={{ fontSize: 11, color: '#9e9e9a', marginTop: 2 }}>{s.subject?.slice(0, 60)}</div>
+                      <div style={{ fontSize: 12, fontWeight: 500, color: 'var(--text)', textDecoration: isDone ? 'line-through' : 'none' }}>
+                        {s.from.replace(/<.*>/, '').trim()}
+                      </div>
+                      <div style={{ fontSize: 10, color: 'var(--text-muted)', marginTop: 2 }}>
+                        {s.subject?.slice(0, 60)}
+                      </div>
                     </div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0, marginLeft: 12 }}>
-                      <span style={{ fontSize: 11, color: '#6b6b67' }}>{s.count} emails</span>
+                      <span style={{ fontSize: 10, color: 'var(--text-dim)' }}>{s.count} emails</span>
                       {isDone ? (
-                        <span style={{ fontSize: 11, color: '#639922', fontWeight: 500 }}>Deleted</span>
+                        <span style={{ fontSize: 10, color: 'var(--green)', fontWeight: 600, letterSpacing: '0.05em' }}>DELETED</span>
                       ) : (
-                        <button
-                          onClick={() => deleteSender(s)}
-                          disabled={isDeleting}
-                          style={{ padding: '5px 12px', borderRadius: 7, background: '#FCEBEB', color: '#791F1F', border: 'none', fontSize: 12, fontWeight: 500, cursor: 'pointer', opacity: isDeleting ? 0.6 : 1 }}>
-                          {isDeleting ? 'Deleting...' : 'Delete all'}
+                        <button onClick={() => deleteSender(s)} disabled={isDeleting}
+                          style={{
+                            padding: '5px 12px', borderRadius: 6,
+                            background: 'var(--red-bg)', color: 'var(--red)',
+                            border: '1px solid rgba(255,68,102,0.3)',
+                            fontSize: 10, fontWeight: 600, cursor: 'pointer',
+                            fontFamily: 'var(--font-body)', letterSpacing: '0.05em',
+                            opacity: isDeleting ? 0.6 : 1
+                          }}>
+                          {isDeleting ? '...' : 'DELETE'}
                         </button>
                       )}
                     </div>
