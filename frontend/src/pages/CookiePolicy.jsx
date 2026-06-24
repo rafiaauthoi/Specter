@@ -7,7 +7,7 @@ export default function CookiePolicy() {
   return (
     <div style={{ minHeight: '100vh', background: 'var(--bg)' }}>
       <nav className="navbar">
-        <span className="navbar-logo">clearprint</span>
+        <span className="navbar-logo">Specter</span>
         <button onClick={() => navigate(-1)}
           style={{ background: 'none', border: 'none', color: 'var(--text-muted)', fontSize: 11, cursor: 'pointer', fontFamily: 'var(--font-body)' }}>
           Back
@@ -21,11 +21,11 @@ export default function CookiePolicy() {
         {[
           {
             title: '1. What we use instead of cookies',
-            body: "Clearprint does not use tracking cookies, advertising cookies, or third-party analytics cookies. Instead of cookies, we use your browser's localStorage to store your session token and user ID locally on your device. This data never leaves your device except as part of authenticated API requests to our backend."
+            body: "Specter does not use tracking cookies, advertising cookies, or third-party analytics cookies. Instead of cookies, we use your browser's localStorage to store your session token and user ID locally on your device. This data never leaves your device except as part of authenticated API requests to our backend."
           },
           {
             title: '2. What is stored in localStorage',
-            body: "When you log in, Clearprint stores two values in your browser's localStorage: your session access token (a JWT issued by Supabase Auth) and your user ID. These are used to keep you logged in across page refreshes and to identify your requests to the backend. They are not used for tracking or advertising."
+            body: "When you log in, Specter stores two values in your browser's localStorage: your session access token (a JWT issued by Supabase Auth) and your user ID. These are used to keep you logged in across page refreshes and to identify your requests to the backend. They are not used for tracking or advertising."
           },
           {
             title: '3. How long it is stored',
@@ -33,7 +33,7 @@ export default function CookiePolicy() {
           },
           {
             title: '4. Third-party cookies',
-            body: "Clearprint does not load any third-party scripts, advertising networks, or analytics platforms that would set their own cookies. When you connect a Google account, you are redirected to Google's own OAuth page, which may set cookies under Google's domain governed by Google's own cookie and privacy policies."
+            body: "Specter does not load any third-party scripts, advertising networks, or analytics platforms that would set their own cookies. When you connect a Google account, you are redirected to Google's own OAuth page, which may set cookies under Google's domain governed by Google's own cookie and privacy policies."
           },
           {
             title: '5. Essential vs non-essential storage',
@@ -41,7 +41,7 @@ export default function CookiePolicy() {
           },
           {
             title: '6. Your choices',
-            body: "You can clear your localStorage at any time through your browser's developer tools or privacy settings. Doing so will log you out of Clearprint. You can also log out using the sign out option in the app, which clears these values automatically."
+            body: "You can clear your localStorage at any time through your browser's developer tools or privacy settings. Doing so will log you out of Specter. You can also log out using the sign out option in the app, which clears these values automatically."
           },
           {
             title: '7. Email delivery',
@@ -49,7 +49,7 @@ export default function CookiePolicy() {
           },
           {
             title: '8. Contact',
-            body: 'For questions about how we handle browser storage or cookies, contact us at privacy@clearprint.app. Note that until a custom domain is configured, this address may not be active.'
+            body: 'For questions about how we handle browser storage or cookies, contact us at privacy@Specter.app. Note that until a custom domain is configured, this address may not be active.'
           },
         ].map(s => (
           <div key={s.title} style={{ marginBottom: 28 }}>

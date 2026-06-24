@@ -33,7 +33,7 @@ export default function CookieBanner() {
       fontFamily: 'var(--font-body)', flexWrap: 'wrap',
     }}>
       <div style={{ fontSize: 12, color: 'var(--text-muted)', lineHeight: 1.5, flex: 1, minWidth: 200 }}>
-        Clearprint uses localStorage to keep you signed in. We do not use tracking or advertising cookies.{' '}
+        Specter uses localStorage to keep you signed in. We do not use tracking or advertising cookies.{' '}
         <button onClick={() => navigate('/cookies')}
           style={{ background: 'none', border: 'none', color: 'var(--pink)', fontSize: 12, cursor: 'pointer', padding: 0, textDecoration: 'underline', fontFamily: 'var(--font-body)' }}>
           Cookie Policy

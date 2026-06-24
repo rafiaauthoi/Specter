@@ -36,7 +36,7 @@ export default function ConnectAccounts() {
   return (
     <div style={{ minHeight: '100vh', background: 'var(--bg)' }}>
       <nav className="navbar">
-        <span className="navbar-logo">clearprint</span>
+        <span className="navbar-logo">Specter</span>
         <button onClick={() => navigate('/dashboard')}
           style={{ background: 'none', border: 'none', color: 'var(--text-muted)', fontSize: 11, cursor: 'pointer', fontFamily: 'var(--font-body)' }}>
           Back to dashboard
@@ -45,7 +45,7 @@ export default function ConnectAccounts() {
 
       <div className="page">
         <h1 className="section-title">Connect Accounts</h1>
-        <p className="section-sub">Clearprint requests minimum permissions only. Tokens are encrypted before storage.</p>
+        <p className="section-sub">Specter requests minimum permissions only. Tokens are encrypted before storage.</p>
 
         <div style={{ background: 'var(--surface)', border: '1px solid var(--border-active)', borderRadius: 'var(--radius)', padding: '10px 14px', marginBottom: 24, fontSize: 11, color: 'var(--pink)' }}>
           Your tokens are encrypted at rest using AES-256. They are never logged or shared.

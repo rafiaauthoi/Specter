@@ -22,7 +22,7 @@ export default function Footer() {
         ))}
       </div>
       <div style={{ fontSize: 10, color: 'var(--text-dim)', lineHeight: 1.6 }}>
-        Clearprint {year}. Email confirmation is required to create an account. Confirmation emails are sent via Resend and are limited to 3,000 per month on the free tier. If you do not receive a confirmation email, please wait a few minutes and try again.
+        Specter {year}. Email confirmation is required to create an account. Confirmation emails are sent via Resend and are limited to 3,000 per month on the free tier. If you do not receive a confirmation email, please wait a few minutes and try again.
       </div>
     </footer>
   )

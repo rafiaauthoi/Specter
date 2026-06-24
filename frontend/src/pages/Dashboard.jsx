@@ -5,9 +5,41 @@ import Footer from '../components/Footer'
 const USER_ID = localStorage.getItem('user_id') || 'demo-user'
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000'
 
+const TAGLINES = [
+  'leave no trace.',
+  'disappear from the internet.',
+  'you were never here.',
+  'erase your digital footprint.',
+]
+
+const BOOT_LINES = [
+  '> initializing specter...',
+  '> scanning environment...',
+  '> encrypting channel...',
+  '> secure connection established.',
+  '> welcome back.',
+]
+
+const REDACTED = [
+  { from: '████████████', subject: '████████████████████████████', count: '?' },
+  { from: '███████████████████', subject: '██████████████████████', count: '?' },
+  { from: '██████████████', subject: '█████████████████████████████', count: '?' },
+  { from: '█████████████████████', subject: '████████████████████', count: '?' },
+  { from: '████████████████', subject: '████████████████████████████', count: '?' },
+]
+
 export default function Dashboard() {
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
+
+  const [booting, setBooting] = useState(() => !sessionStorage.getItem('specter_booted'))
+  const [bootLines, setBootLines] = useState([])
+  const [bootFading, setBootFading] = useState(false)
+
+  const [taglineIndex, setTaglineIndex] = useState(0)
+  const [displayText, setDisplayText] = useState('')
+  const [typing, setTyping] = useState(true)
+
   const [score, setScore] = useState(74)
   const [scanning, setScanning] = useState(false)
   const [scanResults, setScanResults] = useState(() => {
@@ -23,6 +55,49 @@ export default function Dashboard() {
   const [deleted, setDeleted] = useState({})
   const [totalDeleted, setTotalDeleted] = useState(0)
 
+  // Boot sequence
+  useEffect(() => {
+    if (!booting) return
+    let i = 0
+    const interval = setInterval(() => {
+      setBootLines(prev => [...prev, BOOT_LINES[i]])
+      i++
+      if (i >= BOOT_LINES.length) {
+        clearInterval(interval)
+        setTimeout(() => {
+          setBootFading(true)
+          setTimeout(() => {
+            setBooting(false)
+            sessionStorage.setItem('specter_booted', '1')
+          }, 700)
+        }, 500)
+      }
+    }, 300)
+    return () => clearInterval(interval)
+  }, [])
+
+  // Tagline typing
+  useEffect(() => {
+    const target = TAGLINES[taglineIndex]
+    if (typing) {
+      if (displayText.length < target.length) {
+        const t = setTimeout(() => setDisplayText(target.slice(0, displayText.length + 1)), 55)
+        return () => clearTimeout(t)
+      } else {
+        const t = setTimeout(() => setTyping(false), 2200)
+        return () => clearTimeout(t)
+      }
+    } else {
+      if (displayText.length > 0) {
+        const t = setTimeout(() => setDisplayText(displayText.slice(0, -1)), 25)
+        return () => clearTimeout(t)
+      } else {
+        setTaglineIndex(i => (i + 1) % TAGLINES.length)
+        setTyping(true)
+      }
+    }
+  }, [displayText, typing, taglineIndex])
+
   useEffect(() => {
     if (searchParams.get('connected') === 'google') {
       const updated = { ...connected, google: true }
@@ -33,14 +108,12 @@ export default function Dashboard() {
   }, [searchParams])
 
   useEffect(() => {
-    if (scanResults) {
-      setScore(Math.min(100, 30 + scanResults.newsletters_found * 2))
-    }
+    if (scanResults) setScore(Math.min(100, 30 + scanResults.newsletters_found * 2))
   }, [])
 
   function showToast(msg) {
     setToast(msg)
-    setTimeout(() => setToast(null), 3000)
+    setTimeout(() => setToast(null), 3500)
   }
 
   function handleSignOut() {
@@ -49,20 +122,18 @@ export default function Dashboard() {
     localStorage.removeItem('cookie_consent')
     localStorage.removeItem('scan_results')
     localStorage.removeItem('connected_accounts')
+    sessionStorage.removeItem('specter_booted')
     window.location.href = '/login'
   }
 
   async function runScan() {
-    if (!connected.google) {
-      navigate('/connect')
-      return
-    }
+    if (!connected.google) { navigate('/connect'); return }
     setScanning(true)
     try {
       const resp = await fetch(`${API_URL}/google/scan?user_id=${USER_ID}`)
       const data = await resp.json()
       if (!resp.ok) throw new Error(data.detail || 'Scan failed')
-      if (!data.senders) throw new Error('Unexpected response from server')
+      if (!data.senders) throw new Error('Unexpected response')
       setScanResults(data)
       localStorage.setItem('scan_results', JSON.stringify(data))
       setScore(Math.min(100, 30 + data.newsletters_found * 2))
@@ -87,7 +158,7 @@ export default function Dashboard() {
       setDeleted(p => ({ ...p, [senderEmail]: true }))
       setTotalDeleted(n => n + (data.deleted || 0))
       setScore(s => Math.max(0, s - 3))
-      showToast(`Deleted ${data.deleted} emails from ${senderEmail}.`)
+      showToast(`Deleted ${data.deleted} emails.`)
     } catch (e) {
       showToast('Delete failed. Try again.')
     } finally {
@@ -96,48 +167,70 @@ export default function Dashboard() {
   }
 
   const scoreColor = score > 60 ? 'var(--red)' : score > 30 ? 'var(--orange)' : 'var(--green)'
-  const scoreLabel = score > 60 ? 'High exposure' : score > 30 ? 'Medium exposure' : 'Looking good'
+  const scoreLabel = score > 60 ? 'High Exposure' : score > 30 ? 'Medium Exposure' : 'Clean'
+  const threatColor = score > 60 ? 'var(--red)' : score > 30 ? 'var(--orange)' : 'var(--green)'
+  const threatText = score > 60
+    ? 'THREAT LEVEL: HIGH — your digital footprint is exposed'
+    : score > 30
+    ? 'THREAT LEVEL: MEDIUM — some exposure detected'
+    : 'THREAT LEVEL: LOW — footprint is minimal'
 
   const platforms = [
-    {
-      id: 'google', label: 'Google / Gmail',
-      desc: scanResults ? `${scanResults.newsletters_found} senders found` : connected.google ? 'Connected. Run a scan.' : 'Connect to scan.',
-      risk: 'high', isConnected: connected.google
-    },
-    { id: 'twitter', label: 'Twitter / X', desc: 'Tweets, likes, replies', risk: 'high', isConnected: false },
-    { id: 'reddit', label: 'Reddit', desc: 'Posts and comments', risk: 'medium', isConnected: false },
-    { id: 'brokers', label: 'Data brokers', desc: 'Spokeo, Whitepages, and 18 others', risk: 'medium', isConnected: false },
+    { id: 'google',  label: 'Google / Gmail', desc: scanResults ? `${scanResults.newsletters_found} senders found` : connected.google ? 'Connected. Run a scan.' : 'Connect to scan.', risk: 'high',   isConnected: connected.google },
+    { id: 'twitter', label: 'Twitter / X',    desc: 'Tweets, likes, replies',            risk: 'high',   isConnected: false },
+    { id: 'reddit',  label: 'Reddit',         desc: 'Posts and comments',                risk: 'medium', isConnected: false },
+    { id: 'brokers', label: 'Data Brokers',   desc: 'Spokeo, Whitepages, and 18 others', risk: 'medium', isConnected: false },
   ]
+
+  // Boot screen
+  if (booting) {
+    return (
+      <div style={{ minHeight: '100vh', background: 'var(--bg)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24, opacity: bootFading ? 0 : 1, transition: 'opacity 0.7s ease' }}>
+        <div style={{ maxWidth: 480, width: '100%' }}>
+          <div style={{ fontFamily: 'var(--font-display)', fontSize: 14, color: 'var(--pink)', marginBottom: 32, letterSpacing: '0.05em' }}>specter</div>
+          {bootLines.map((line, i) => (
+            <div key={i} style={{ fontSize: 13, color: i === bootLines.length - 1 ? 'var(--pink)' : 'var(--text-muted)', marginBottom: 10, fontFamily: 'monospace', animation: 'fadeIn 0.3s ease' }}>
+              {line}
+            </div>
+          ))}
+          {bootLines.length > 0 && (
+            <span style={{ fontSize: 13, color: 'var(--pink)', fontFamily: 'monospace', animation: 'blink 1s infinite' }}>█</span>
+          )}
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div style={{ minHeight: '100vh', background: 'var(--bg)' }}>
 
+      {/* Threat level bar */}
+      <div style={{ background: `${threatColor}15`, borderBottom: `1px solid ${threatColor}35`, padding: '7px 24px', textAlign: 'center', position: 'relative', zIndex: 101 }}>
+        <span style={{ fontSize: 9, color: threatColor, fontFamily: 'var(--font-display)', letterSpacing: '0.06em' }}>
+          {threatText}
+        </span>
+      </div>
+
       {toast && (
-        <div style={{
-          position: 'fixed', top: 20, right: 20, zIndex: 998,
-          background: 'var(--surface)', border: '1px solid var(--border-active)',
-          color: 'var(--pink)', padding: '10px 18px', borderRadius: 'var(--radius)',
-          fontSize: 12, fontFamily: 'var(--font-body)',
-          boxShadow: '0 0 16px var(--pink-glow)'
-        }}>
+        <div style={{ position: 'fixed', top: 20, right: 20, zIndex: 998, background: 'var(--surface)', border: '1px solid var(--border-active)', color: 'var(--pink)', padding: '12px 20px', borderRadius: 'var(--radius)', fontSize: 13, boxShadow: '0 0 20px var(--pink-glow)', animation: 'fadeIn 0.2s ease' }}>
           {toast}
         </div>
       )}
 
       {/* Navbar */}
       <nav className="navbar">
-        <span className="navbar-logo">clearprint</span>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+          <span className="navbar-logo">specter</span>
+          <div style={{ fontSize: 10, color: 'var(--text-muted)', fontFamily: 'monospace', letterSpacing: '0.02em', minHeight: 14 }}>
+            {displayText}<span style={{ animation: 'blink 1s infinite', color: 'var(--pink)' }}>_</span>
+          </div>
+        </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          <button className="btn-ghost" onClick={runScan} disabled={scanning}
-            style={{ opacity: scanning ? 0.6 : 1, fontSize: 11 }}>
+          <button className="btn-ghost" onClick={runScan} disabled={scanning} style={{ opacity: scanning ? 0.6 : 1, fontSize: 12 }}>
             {scanning ? 'Scanning...' : 'Scan now'}
           </button>
-          <button className="btn-primary" onClick={() => navigate('/connect')}
-            style={{ fontSize: 11 }}>
-            Connect
-          </button>
-          <button onClick={handleSignOut}
-            style={{ background: 'none', border: 'none', color: 'var(--text-muted)', fontSize: 11, cursor: 'pointer', fontFamily: 'var(--font-body)' }}>
+          <button className="btn-primary" onClick={() => navigate('/connect')} style={{ fontSize: 12 }}>Connect</button>
+          <button onClick={handleSignOut} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', fontSize: 12, cursor: 'pointer', fontFamily: 'var(--font-body)' }}>
             Sign out
           </button>
         </div>
@@ -145,139 +238,140 @@ export default function Dashboard() {
 
       <div className="page">
 
-        <div style={{ marginBottom: 28 }}>
-          <h1 className="section-title">Your Footprint</h1>
-          <p className="section-sub">Connect accounts to scan and clean your digital trail</p>
-        </div>
+        {/* Hero */}
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '48px 0 52px', borderBottom: '1px solid var(--border)', marginBottom: 40 }}>
 
-        {/* Exposure score */}
-        <div className="card" style={{
-          display: 'flex', alignItems: 'center', gap: 24, marginBottom: 16,
-          animation: 'glow-pulse 4s ease-in-out infinite'
-        }}>
-          <div style={{ position: 'relative', flexShrink: 0 }}>
-            <svg width="80" height="80" viewBox="0 0 80 80">
-              <circle cx="40" cy="40" r="34" fill="none" stroke="var(--surface-2)" strokeWidth="6"/>
-              <circle cx="40" cy="40" r="34" fill="none" stroke={scoreColor} strokeWidth="6"
-                strokeDasharray={`${(score/100)*213.6} 213.6`}
-                strokeLinecap="round" transform="rotate(-90 40 40)"
-                style={{ filter: `drop-shadow(0 0 6px ${scoreColor})`, transition: 'stroke-dasharray 0.6s ease' }}/>
-              <text x="40" y="45" textAnchor="middle" fontSize="16" fontWeight="600" fill={scoreColor}
-                fontFamily="var(--font-body)">{score}</text>
+          <svg width="0" height="0" style={{ position: 'absolute' }}>
+            <defs>
+              <filter id="noise-filter">
+                <feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="4" stitchTiles="stitch" result="noise"/>
+                <feColorMatrix type="saturate" values="0" in="noise" result="gray"/>
+                <feBlend in="SourceGraphic" in2="gray" mode="overlay" result="blend"/>
+                <feComposite in="blend" in2="SourceGraphic" operator="in"/>
+              </filter>
+            </defs>
+          </svg>
+
+          <div style={{ marginBottom: 28, filter: score > 60 ? 'url(#noise-filter)' : 'none', transition: 'filter 1.2s ease' }}>
+            <svg width="200" height="200" viewBox="0 0 200 200">
+              <circle cx="100" cy="100" r="86" fill="none" stroke="var(--surface-2)" strokeWidth="8"/>
+              <circle cx="100" cy="100" r="86" fill="none" stroke={scoreColor} strokeWidth="8"
+                strokeDasharray={`${(score/100)*540.4} 540.4`}
+                strokeLinecap="round" transform="rotate(-90 100 100)"
+                style={{ filter: `drop-shadow(0 0 14px ${scoreColor}) drop-shadow(0 0 28px ${scoreColor}60)`, transition: 'stroke-dasharray 0.9s ease, stroke 0.9s ease' }}/>
+              <text x="100" y="92" textAnchor="middle" fontSize="42" fontWeight="700" fill={scoreColor} fontFamily="var(--font-body)">{score}</text>
+              <text x="100" y="116" textAnchor="middle" fontSize="12" fill="var(--text-muted)" fontFamily="var(--font-body)">exposure score</text>
             </svg>
           </div>
-          <div>
-            <div style={{ fontSize: 15, fontWeight: 600, color: 'var(--text)', marginBottom: 4 }}>
-              Exposure Score
-            </div>
-            <div style={{ fontSize: 12, color: scoreColor, fontWeight: 500, marginBottom: 4 }}>
-              {scoreLabel}
-            </div>
-            <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>
-              {connected.google ? 'Run a scan to update' : 'Connect an account to get started'}
+
+          <div style={{ textAlign: 'center' }}>
+            <div style={{ fontSize: 30, fontWeight: 700, color: 'var(--text)', marginBottom: 8 }}>Your Footprint</div>
+            <div style={{ fontSize: 16, color: scoreColor, fontWeight: 600, marginBottom: 8 }}>{scoreLabel}</div>
+            <div style={{ fontSize: 14, color: 'var(--text-muted)' }}>
+              {connected.google ? 'Run a scan to update your exposure score' : 'Connect an account to get started'}
             </div>
           </div>
         </div>
 
         {/* Metrics */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 10, marginBottom: 24 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 14, marginBottom: 40 }}>
           {[
-            { label: 'Newsletters found', value: scanResults?.newsletters_found ?? '--', sub: 'from Gmail' },
-            { label: 'Emails deleted',    value: totalDeleted,                           sub: 'this session' },
-            { label: 'Time saved',        value: totalDeleted > 0 ? `${Math.round(totalDeleted * 0.1)}m` : '0m', sub: 'vs. manual' },
+            { label: 'Newsletters Found', value: scanResults?.newsletters_found ?? '--', sub: 'from Gmail' },
+            { label: 'Emails Deleted',    value: totalDeleted,                           sub: 'this session' },
+            { label: 'Time Saved',        value: totalDeleted > 0 ? `${Math.round(totalDeleted * 0.1)}m` : '0m', sub: 'vs. manual' },
           ].map(m => (
-            <div key={m.label} className="card" style={{ padding: '14px 16px' }}>
-              <div style={{ fontSize: 10, color: 'var(--text-muted)', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.08em' }}>{m.label}</div>
-              <div style={{ fontSize: 24, fontWeight: 600, color: 'var(--pink)', marginBottom: 2 }}>{m.value}</div>
-              <div style={{ fontSize: 10, color: 'var(--text-dim)' }}>{m.sub}</div>
+            <div key={m.label} className="card" style={{ padding: '20px 16px', textAlign: 'center' }}>
+              <div style={{ fontSize: 11, color: 'var(--text-muted)', marginBottom: 10, textTransform: 'uppercase', letterSpacing: '0.08em' }}>{m.label}</div>
+              <div style={{ fontSize: 36, fontWeight: 700, color: 'var(--pink)', marginBottom: 6, lineHeight: 1 }}>{m.value}</div>
+              <div style={{ fontSize: 12, color: 'var(--text-dim)' }}>{m.sub}</div>
             </div>
           ))}
         </div>
 
-        {/* Platform cards */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 28 }}>
+        {/* Platforms section */}
+        <div className="divider" style={{ marginBottom: 16 }}>
+          <span className="divider-label">Connected Platforms</span>
+          <div className="divider-line" />
+        </div>
+
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 40 }}>
           {platforms.map(p => (
             <div key={p.id}
               onClick={() => p.id === 'brokers' ? navigate('/removal') : p.id === 'google' && !p.isConnected ? navigate('/connect') : null}
-              style={{
-                background: 'var(--surface)', border: `1px solid ${p.isConnected ? 'rgba(57,255,138,0.3)' : 'var(--border)'}`,
-                borderRadius: 'var(--radius-lg)', padding: '14px 18px',
-                display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                cursor: 'pointer', transition: 'border-color 0.2s, box-shadow 0.2s'
-              }}
+              style={{ background: 'var(--surface)', border: `1px solid ${p.isConnected ? 'rgba(57,255,138,0.3)' : 'var(--border)'}`, borderRadius: 'var(--radius-lg)', padding: '18px 22px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer', transition: 'all 0.3s ease' }}
               onMouseEnter={e => {
-                e.currentTarget.style.borderColor = p.isConnected ? 'rgba(57,255,138,0.6)' : 'var(--border-active)'
-                e.currentTarget.style.boxShadow = '0 0 12px var(--pink-glow)'
+                e.currentTarget.style.borderColor = p.isConnected ? 'rgba(57,255,138,0.7)' : 'var(--pink)'
+                e.currentTarget.style.boxShadow = '0 0 24px var(--pink-glow-strong), 0 0 48px var(--pink-glow)'
+                e.currentTarget.style.transform = 'translateY(-2px)'
               }}
               onMouseLeave={e => {
                 e.currentTarget.style.borderColor = p.isConnected ? 'rgba(57,255,138,0.3)' : 'var(--border)'
                 e.currentTarget.style.boxShadow = 'none'
+                e.currentTarget.style.transform = 'translateY(0)'
               }}>
               <div>
-                <div style={{ fontSize: 13, fontWeight: 500, color: 'var(--text)', marginBottom: 2 }}>{p.label}</div>
-                <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>{p.desc}</div>
+                <div style={{ fontSize: 15, fontWeight: 600, color: 'var(--text)', marginBottom: 4 }}>{p.label}</div>
+                <div style={{ fontSize: 13, color: 'var(--text-muted)' }}>{p.desc}</div>
               </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
-                {p.isConnected && (
-                  <span style={{ fontSize: 10, color: 'var(--green)', fontWeight: 600, letterSpacing: '0.05em' }}>CONNECTED</span>
-                )}
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0 }}>
+                {p.isConnected && <span style={{ fontSize: 10, color: 'var(--green)', fontWeight: 700, letterSpacing: '0.08em' }}>CONNECTED</span>}
                 <span className={`badge-${p.risk}`}>{p.risk}</span>
               </div>
             </div>
           ))}
         </div>
 
-        {/* Scan results */}
-        {scanResults && scanResults.senders.length > 0 && (
-          <div>
-            <div style={{ fontSize: 11, color: 'var(--pink)', fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 12 }}>
-              Newsletter Senders Found
-            </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-              {scanResults.senders.map((s, i) => {
-                const senderEmail = s.from.match(/<(.+)>/) ? s.from.match(/<(.+)>/)[1] : s.from
-                const isDone = deleted[senderEmail]
-                const isDeleting = deleting[senderEmail]
-                return (
-                  <div key={i} style={{
-                    background: 'var(--surface)',
-                    border: `1px solid ${isDone ? 'rgba(57,255,138,0.3)' : 'var(--border)'}`,
-                    borderRadius: 'var(--radius)', padding: '11px 14px',
-                    display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                    opacity: isDone ? 0.5 : 1, transition: 'opacity 0.3s'
-                  }}>
-                    <div>
-                      <div style={{ fontSize: 12, fontWeight: 500, color: 'var(--text)', textDecoration: isDone ? 'line-through' : 'none' }}>
-                        {s.from.replace(/<.*>/, '').trim()}
-                      </div>
-                      <div style={{ fontSize: 10, color: 'var(--text-muted)', marginTop: 2 }}>
-                        {s.subject?.slice(0, 60)}
-                      </div>
+        {/* Scan results section */}
+        <div className="divider" style={{ marginBottom: 16 }}>
+          <span className="divider-label">{scanResults ? 'Newsletter Senders Found' : 'Awaiting Scan'}</span>
+          <div className="divider-line" />
+        </div>
+
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+          {!scanResults ? (
+            REDACTED.map((r, i) => (
+              <div key={i} style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 'var(--radius)', padding: '14px 18px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', opacity: 0.4 }}>
+                <div>
+                  <div style={{ fontSize: 14, color: 'var(--pink)', fontFamily: 'monospace', marginBottom: 4, letterSpacing: '0.05em' }}>{r.from}</div>
+                  <div style={{ fontSize: 12, color: 'var(--text-dim)', fontFamily: 'monospace' }}>{r.subject}</div>
+                </div>
+                <span style={{ fontSize: 12, color: 'var(--text-dim)', flexShrink: 0, marginLeft: 16 }}>? emails</span>
+              </div>
+            ))
+          ) : (
+            scanResults.senders.map((s, i) => {
+              const senderEmail = s.from.match(/<(.+)>/) ? s.from.match(/<(.+)>/)[1] : s.from
+              const isDone = deleted[senderEmail]
+              const isDeleting = deleting[senderEmail]
+              return (
+                <div key={i}
+                  style={{ background: 'var(--surface)', border: `1px solid ${isDone ? 'rgba(57,255,138,0.3)' : 'var(--border)'}`, borderRadius: 'var(--radius)', padding: '13px 18px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', opacity: isDone ? 0.45 : 1, transition: 'all 0.3s ease', animation: `reveal 0.3s ease ${i * 0.04}s both` }}
+                  onMouseEnter={e => { if (!isDone) { e.currentTarget.style.borderColor = 'var(--border-active)'; e.currentTarget.style.boxShadow = '0 0 12px var(--pink-glow)' }}}
+                  onMouseLeave={e => { e.currentTarget.style.borderColor = isDone ? 'rgba(57,255,138,0.3)' : 'var(--border)'; e.currentTarget.style.boxShadow = 'none' }}>
+                  <div>
+                    <div style={{ fontSize: 14, fontWeight: 500, color: 'var(--text)', textDecoration: isDone ? 'line-through' : 'none', marginBottom: 3 }}>
+                      {s.from.replace(/<.*>/, '').trim()}
                     </div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0, marginLeft: 12 }}>
-                      <span style={{ fontSize: 10, color: 'var(--text-dim)' }}>{s.count} emails</span>
-                      {isDone ? (
-                        <span style={{ fontSize: 10, color: 'var(--green)', fontWeight: 600, letterSpacing: '0.05em' }}>DELETED</span>
-                      ) : (
-                        <button onClick={() => deleteSender(s)} disabled={isDeleting}
-                          style={{
-                            padding: '5px 12px', borderRadius: 6,
-                            background: 'var(--red-bg)', color: 'var(--red)',
-                            border: '1px solid rgba(255,68,102,0.3)',
-                            fontSize: 10, fontWeight: 600, cursor: 'pointer',
-                            fontFamily: 'var(--font-body)', letterSpacing: '0.05em',
-                            opacity: isDeleting ? 0.6 : 1
-                          }}>
-                          {isDeleting ? '...' : 'DELETE'}
-                        </button>
-                      )}
-                    </div>
+                    <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>{s.subject?.slice(0, 64)}</div>
                   </div>
-                )
-              })}
-            </div>
-          </div>
-        )}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexShrink: 0, marginLeft: 16 }}>
+                    <span style={{ fontSize: 12, color: 'var(--text-dim)' }}>{s.count} emails</span>
+                    {isDone ? (
+                      <span style={{ fontSize: 10, color: 'var(--green)', fontWeight: 700, letterSpacing: '0.06em' }}>DELETED</span>
+                    ) : (
+                      <button onClick={() => deleteSender(s)} disabled={isDeleting}
+                        style={{ padding: '6px 16px', borderRadius: 6, background: 'var(--red-bg)', color: 'var(--red)', border: '1px solid rgba(255,68,102,0.3)', fontSize: 11, fontWeight: 700, cursor: 'pointer', fontFamily: 'var(--font-body)', letterSpacing: '0.06em', opacity: isDeleting ? 0.6 : 1, transition: 'box-shadow 0.2s' }}
+                        onMouseEnter={e => e.currentTarget.style.boxShadow = '0 0 10px rgba(255,68,102,0.4)'}
+                        onMouseLeave={e => e.currentTarget.style.boxShadow = 'none'}>
+                        {isDeleting ? '...' : 'DELETE'}
+                      </button>
+                    )}
+                  </div>
+                </div>
+              )
+            })
+          )}
+        </div>
 
         <Footer />
       </div>

@@ -7,7 +7,7 @@ export default function Security() {
   return (
     <div style={{ minHeight: '100vh', background: 'var(--bg)' }}>
       <nav className="navbar">
-        <span className="navbar-logo">clearprint</span>
+        <span className="navbar-logo">Specter</span>
         <button onClick={() => navigate(-1)}
           style={{ background: 'none', border: 'none', color: 'var(--text-muted)', fontSize: 11, cursor: 'pointer', fontFamily: 'var(--font-body)' }}>
           Back
@@ -18,21 +18,21 @@ export default function Security() {
         <h1 className="section-title">Security</h1>
         <p style={{ fontSize: 11, color: 'var(--text-dim)', marginBottom: 8 }}>Last updated: June 2026</p>
         <p style={{ fontSize: 13, color: 'var(--text-muted)', marginBottom: 32, lineHeight: 1.7 }}>
-          Clearprint was built with security as a core requirement, not an afterthought. This page documents the specific technical controls in place.
+          Specter was built with security as a core requirement, not an afterthought. This page documents the specific technical controls in place.
         </p>
 
         {[
           {
             title: 'Authentication',
-            body: 'User authentication is handled by Supabase Auth, which uses bcrypt for password hashing. Passwords are never stored by Clearprint directly. Sessions are managed using short-lived JWTs issued by Supabase. Email confirmation is required for all new accounts, enforced via SMTP through Resend.'
+            body: 'User authentication is handled by Supabase Auth, which uses bcrypt for password hashing. Passwords are never stored by Specter directly. Sessions are managed using short-lived JWTs issued by Supabase. Email confirmation is required for all new accounts, enforced via SMTP through Resend.'
           },
           {
             title: 'OAuth token handling',
-            body: 'When you connect a third-party account such as Google, Clearprint receives an OAuth access token and refresh token. Both tokens are encrypted using AES-256 (via the Fernet symmetric encryption scheme) before being written to the database. The encryption key is derived from a server-side secret that is never committed to version control or exposed in any API response.'
+            body: 'When you connect a third-party account such as Google, Specter receives an OAuth access token and refresh token. Both tokens are encrypted using AES-256 (via the Fernet symmetric encryption scheme) before being written to the database. The encryption key is derived from a server-side secret that is never committed to version control or exposed in any API response.'
           },
           {
             title: 'Minimum OAuth scopes',
-            body: 'Clearprint requests only the minimum OAuth scopes necessary to perform each function. For Google, we request gmail.modify (required to read and label emails) and userinfo.email (required to identify the account). We do not request access to Google Drive, Contacts, Calendar, or any other Google service.'
+            body: 'Specter requests only the minimum OAuth scopes necessary to perform each function. For Google, we request gmail.modify (required to read and label emails) and userinfo.email (required to identify the account). We do not request access to Google Drive, Contacts, Calendar, or any other Google service.'
           },
           {
             title: 'Token logging policy',
@@ -56,7 +56,7 @@ export default function Security() {
           },
           {
             title: 'Responsible disclosure',
-            body: 'If you discover a security vulnerability in Clearprint, please report it responsibly by emailing security@clearprint.app. Note that until a custom domain is configured, this address may not be active. We will acknowledge reports within 72 hours and aim to remediate confirmed issues promptly.'
+            body: 'If you discover a security vulnerability in Specter, please report it responsibly by emailing security@Specter.app. Note that until a custom domain is configured, this address may not be active. We will acknowledge reports within 72 hours and aim to remediate confirmed issues promptly.'
           },
         ].map(s => (
           <div key={s.title} style={{ marginBottom: 28 }}>

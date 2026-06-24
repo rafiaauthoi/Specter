@@ -55,7 +55,7 @@ ${userInfo.name}`
   return (
     <div style={{ minHeight: '100vh', background: 'var(--bg)' }}>
       <nav className="navbar">
-        <span className="navbar-logo">clearprint</span>
+        <span className="navbar-logo">Specter</span>
         <button onClick={() => navigate('/dashboard')}
           style={{ background: 'none', border: 'none', color: 'var(--text-muted)', fontSize: 11, cursor: 'pointer', fontFamily: 'var(--font-body)' }}>
           Back to dashboard

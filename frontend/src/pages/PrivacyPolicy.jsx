@@ -7,7 +7,7 @@ export default function PrivacyPolicy() {
   return (
     <div style={{ minHeight: '100vh', background: 'var(--bg)' }}>
       <nav className="navbar">
-        <span className="navbar-logo">clearprint</span>
+        <span className="navbar-logo">Specter</span>
         <button onClick={() => navigate(-1)}
           style={{ background: 'none', border: 'none', color: 'var(--text-muted)', fontSize: 11, cursor: 'pointer', fontFamily: 'var(--font-body)' }}>
           Back
@@ -20,8 +20,8 @@ export default function PrivacyPolicy() {
 
         {[
           {
-            title: '1. What Clearprint does',
-            body: 'Clearprint is a digital footprint cleanup tool. It connects to your accounts via OAuth, scans for data you may want to remove, and helps you delete or opt out of that data. Clearprint does not sell, share, or monetize your personal information in any form.'
+            title: '1. What Specter does',
+            body: 'Specter is a digital footprint cleanup tool. It connects to your accounts via OAuth, scans for data you may want to remove, and helps you delete or opt out of that data. Specter does not sell, share, or monetize your personal information in any form.'
           },
           {
             title: '2. What data we collect',
@@ -33,11 +33,11 @@ export default function PrivacyPolicy() {
           },
           {
             title: '4. How we protect your data',
-            body: 'OAuth tokens are encrypted at rest using AES-256 encryption before being stored in our database. Your account password is never stored by Clearprint. Authentication is handled by Supabase, which uses bcrypt hashing for passwords. We use HTTPS for all data in transit. We do not log OAuth tokens or API responses.'
+            body: 'OAuth tokens are encrypted at rest using AES-256 encryption before being stored in our database. Your account password is never stored by Specter. Authentication is handled by Supabase, which uses bcrypt hashing for passwords. We use HTTPS for all data in transit. We do not log OAuth tokens or API responses.'
           },
           {
             title: '5. Third-party services',
-            body: 'Clearprint uses Supabase for authentication and database storage, Resend for transactional email delivery, and Google APIs for Gmail scanning. Each of these services has its own privacy policy. We only share the minimum data necessary with each provider to perform the requested function.'
+            body: 'Specter uses Supabase for authentication and database storage, Resend for transactional email delivery, and Google APIs for Gmail scanning. Each of these services has its own privacy policy. We only share the minimum data necessary with each provider to perform the requested function.'
           },
           {
             title: '6. Data retention',
@@ -49,7 +49,7 @@ export default function PrivacyPolicy() {
           },
           {
             title: '8. Contact',
-            body: 'For any privacy-related questions or requests, contact us at privacy@clearprint.app. Note that until a custom domain is configured, this address may not be active. Please check the site for current contact information.'
+            body: 'For any privacy-related questions or requests, contact us at privacy@Specter.app. Note that until a custom domain is configured, this address may not be active. Please check the site for current contact information.'
           },
         ].map(s => (
           <div key={s.title} style={{ marginBottom: 28 }}>

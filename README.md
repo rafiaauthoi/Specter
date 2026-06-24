@@ -1,6 +1,6 @@
-# Clearprint
+# Specter
 
-Clearprint is a digital footprint cleanup tool that helps you scan, identify, and remove your personal data from the internet. Connect your accounts, scan for exposure, and delete what you don't want out there.
+Specter is a digital footprint cleanup tool that helps you scan, identify, and remove your personal data from the internet. Connect your accounts, scan for exposure, and delete what you don't want out there.
 
 **Live demo:** https://clear-print.vercel.app
 
@@ -59,8 +59,8 @@ See the [Security page](https://clear-print.vercel.app/security) for full detail
 
 **Clone the repo**
 ```bash
-git clone https://github.com/rafiaauthoi/ClearPrint.git
-cd ClearPrint
+git clone https://github.com/rafiaauthoi/Specter.git
+cd Specter
 ```
 
 **Backend setup**
@@ -110,7 +110,7 @@ Open http://localhost:5173
 
 ## Project structure
 
-clearprint/
+Specter/
 
 ├── backend/
 
