@@ -183,8 +183,8 @@ export default function Dashboard() {
 
   const platforms = [
     { id: 'google',  label: 'Google / Gmail', desc: scanResults ? `${scanResults.newsletters_found} senders found` : connected.google ? 'Connected. Run a scan.' : 'Connect to scan.', risk: 'high',   isConnected: connected.google },
-    { id: 'twitter', label: 'Twitter / X',    desc: 'Tweets, likes, replies',            risk: 'high',   isConnected: false },
-    { id: 'reddit',  label: 'Reddit',         desc: 'Posts and comments',                risk: 'medium', isConnected: false },
+    { id: 'twitter', label: 'Twitter / X', desc: 'Tweet deletion coming soon', risk: null, isConnected: false, soon: true },
+    { id: 'reddit', label: 'Reddit', desc: 'Post and comment deletion coming soon', risk: null, isConnected: false, soon: true },
     { id: 'brokers', label: 'Data Brokers',   desc: 'Spokeo, Whitepages, and 18 others', risk: 'medium', isConnected: false },
   ]
 
@@ -249,14 +249,15 @@ export default function Dashboard() {
             {displayText}<span style={{ animation: 'blink 1s infinite', color: 'var(--pink)' }}>_</span>
           </div>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          <button className="btn-ghost" onClick={runScan} disabled={scanning} style={{ opacity: scanning ? 0.6 : 1, fontSize: 12 }}>
-            {scanning ? 'Scanning...' : 'Scan now'}
-          </button>
-          <button className="btn-primary" onClick={() => navigate('/connect')} style={{ fontSize: 12 }}>Connect</button>
-          <button onClick={handleSignOut} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', fontSize: 12, cursor: 'pointer', fontFamily: 'var(--font-body)' }}>
-            Sign out
-          </button>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0 }}>
+          {p.isConnected && (
+            <span style={{ fontSize: 10, color: 'var(--green)', fontWeight: 700, letterSpacing: '0.08em' }}>CONNECTED</span>
+          )}
+          {p.soon ? (
+            <span style={{ fontSize: 10, color: 'var(--text-dim)', fontWeight: 600, letterSpacing: '0.06em', padding: '3px 10px', borderRadius: 20, border: '1px solid var(--border)', background: 'var(--surface-2)' }}>SOON</span>
+          ) : p.risk ? (
+          <span className={`badge-${p.risk}`}>{p.risk}</span>
+          ) : null}
         </div>
       </nav>
 
