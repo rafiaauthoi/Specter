@@ -56,7 +56,7 @@ body::before {
     linear-gradient(90deg, rgba(255, 105, 180, 0.03) 1px, transparent 1px);
   background-size: 48px 48px;
   pointer-events: none;
-  z-index: 0;
+  z-index: -1;
 }
 
 /* Scanline overlay */
@@ -252,7 +252,8 @@ input::placeholder { color: var(--text-dim); }
 }
 
 .navbar-logo:hover {
-  animation: glitch 0.5s steps(1), flicker 8s infinite 0.5s;
+  animation: glitch 0.4s linear;
+  color: var(--pink);
 }
 
 .page {

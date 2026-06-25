@@ -104,8 +104,8 @@ Open http://localhost:5173
 
 ## Project structure
 
+```
 Specter/
-
 ├── backend/
 │   ├── core/          # Config, database, encryption
 │   ├── routers/       # Auth and Google API routes
@@ -113,11 +113,11 @@ Specter/
 │   ├── main.py
 │   └── setup_db.py
 └── frontend/
-└── src/
-├── components/  # Footer, CookieBanner
-└── pages/       # Dashboard, Login, ConnectAccounts,
-
-# GuidedRemoval, Policy Pages
+    └── src/
+        ├── components/   # Footer, CookieBanner
+        └── pages/        # Dashboard, Login, ConnectAccounts,
+                          # GuidedRemoval, policy pages
+```
 
 ---
 
