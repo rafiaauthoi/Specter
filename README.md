@@ -2,7 +2,7 @@
 
 Specter is a digital footprint cleanup tool that helps you scan, identify, and remove your personal data from the internet. Connect your accounts, scan for exposure, and delete what you don't want out there.
 
-**Live demo:** https://clear-print.vercel.app
+**Live demo:** https://specter-io.vercel.app
 
 ---
 
@@ -49,7 +49,7 @@ Specter is a digital footprint cleanup tool that helps you scan, identify, and r
 - Email confirmation required for all new accounts
 - Session tokens are short-lived JWTs issued by Supabase Auth
 
-See the [Security page](https://clear-print.vercel.app/security) for full details.
+See the [Security page](https://specter-io.vercel.app/security) for full details.
 
 ---
 
@@ -129,5 +129,5 @@ This project includes a Privacy Policy, Terms of Service, Cookie Policy, and Sec
 
 ## Author
 
-Rafia Authoi | Computer Information Systems, Western Michigan University  
+Rafia Authoi | Computer Information Systems | Western Michigan University  
 Minors: Cybersecurity | UX/UI | General Business
