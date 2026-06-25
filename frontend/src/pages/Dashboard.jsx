@@ -57,7 +57,6 @@ export default function Dashboard() {
   const [totalDeleted, setTotalDeleted] = useState(0)
   const [lastScan, setLastScan] = useState(() => localStorage.getItem('last_scan_time') || null)
 
-  // Boot sequence
   useEffect(() => {
     if (!booting) return
     let i = 0
@@ -78,7 +77,6 @@ export default function Dashboard() {
     return () => clearInterval(interval)
   }, [])
 
-  // Tagline typing
   useEffect(() => {
     const target = TAGLINES[taglineIndex]
     if (typing) {
@@ -182,10 +180,38 @@ export default function Dashboard() {
     : 'THREAT LEVEL: LOW — footprint is minimal'
 
   const platforms = [
-    { id: 'google',  label: 'Google / Gmail', desc: scanResults ? `${scanResults.newsletters_found} senders found` : connected.google ? 'Connected. Run a scan.' : 'Connect to scan.', risk: 'high',   isConnected: connected.google },
-    { id: 'twitter', label: 'Twitter / X', desc: 'Tweet deletion coming soon', risk: null, isConnected: false, soon: true },
-    { id: 'reddit', label: 'Reddit', desc: 'Post and comment deletion coming soon', risk: null, isConnected: false, soon: true },
-    { id: 'brokers', label: 'Data Brokers',   desc: 'Spokeo, Whitepages, and 18 others', risk: 'medium', isConnected: false },
+    {
+      id: 'google',
+      label: 'Google / Gmail',
+      desc: scanResults ? `${scanResults.newsletters_found} senders found` : connected.google ? 'Connected. Run a scan.' : 'Connect to scan.',
+      risk: 'high',
+      isConnected: connected.google,
+      soon: false,
+    },
+    {
+      id: 'twitter',
+      label: 'Twitter / X',
+      desc: 'Tweet deletion coming soon',
+      risk: null,
+      isConnected: false,
+      soon: true,
+    },
+    {
+      id: 'reddit',
+      label: 'Reddit',
+      desc: 'Post and comment deletion coming soon',
+      risk: null,
+      isConnected: false,
+      soon: true,
+    },
+    {
+      id: 'brokers',
+      label: 'Data Brokers',
+      desc: 'Spokeo, Whitepages, and 18 others',
+      risk: 'medium',
+      isConnected: false,
+      soon: false,
+    },
   ]
 
   if (booting) {
@@ -218,7 +244,6 @@ export default function Dashboard() {
   return (
     <div style={{ minHeight: '100vh', background: 'var(--bg)' }}>
 
-      {/* Threat level bar */}
       <div style={{
         background: `${threatColor}12`,
         borderBottom: `1px solid ${threatColor}30`,
@@ -241,7 +266,6 @@ export default function Dashboard() {
         </div>
       )}
 
-      {/* Navbar */}
       <nav className="navbar">
         <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
           <span className="navbar-logo">specter</span>
@@ -249,26 +273,23 @@ export default function Dashboard() {
             {displayText}<span style={{ animation: 'blink 1s infinite', color: 'var(--pink)' }}>_</span>
           </div>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0 }}>
-          {p.isConnected && (
-            <span style={{ fontSize: 10, color: 'var(--green)', fontWeight: 700, letterSpacing: '0.08em' }}>CONNECTED</span>
-          )}
-          {p.soon ? (
-            <span style={{ fontSize: 10, color: 'var(--text-dim)', fontWeight: 600, letterSpacing: '0.06em', padding: '3px 10px', borderRadius: 20, border: '1px solid var(--border)', background: 'var(--surface-2)' }}>SOON</span>
-          ) : p.risk ? (
-          <span className={`badge-${p.risk}`}>{p.risk}</span>
-          ) : null}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          <button className="btn-ghost" onClick={runScan} disabled={scanning} style={{ opacity: scanning ? 0.6 : 1, fontSize: 12 }}>
+            {scanning ? 'Scanning...' : 'Scan now'}
+          </button>
+          <button className="btn-primary" onClick={() => navigate('/connect')} style={{ fontSize: 12 }}>Connect</button>
+          <button onClick={handleSignOut} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', fontSize: 12, cursor: 'pointer', fontFamily: 'var(--font-body)' }}>
+            Sign out
+          </button>
         </div>
       </nav>
 
       <div className="page">
 
-        {/* Hero */}
         <div style={{
           display: 'flex', flexDirection: 'column', alignItems: 'center',
           padding: '52px 0 56px', borderBottom: '1px solid var(--border)', marginBottom: 44
         }}>
-
           <svg width="0" height="0" style={{ position: 'absolute' }}>
             <defs>
               <filter id="noise-filter">
@@ -286,10 +307,7 @@ export default function Dashboard() {
               <circle cx="110" cy="110" r="95" fill="none" stroke={scoreColor} strokeWidth="8"
                 strokeDasharray={`${(score/100)*596.9} 596.9`}
                 strokeLinecap="round" transform="rotate(-90 110 110)"
-                style={{
-                  filter: `drop-shadow(0 0 16px ${scoreColor}) drop-shadow(0 0 32px ${scoreColor}60)`,
-                  transition: 'stroke-dasharray 0.9s ease, stroke 0.9s ease'
-                }}/>
+                style={{ filter: `drop-shadow(0 0 16px ${scoreColor}) drop-shadow(0 0 32px ${scoreColor}60)`, transition: 'stroke-dasharray 0.9s ease, stroke 0.9s ease' }}/>
               <text x="110" y="100" textAnchor="middle" fontSize="52" fontWeight="700" fill={scoreColor} fontFamily="var(--font-body)">{score}</text>
               <text x="110" y="124" textAnchor="middle" fontSize="13" fill="var(--text-muted)" fontFamily="var(--font-body)">exposure score</text>
               <text x="110" y="144" textAnchor="middle" fontSize="11" fill={scoreColor} fontFamily="var(--font-body)" fontWeight="600">{scoreLabel.toUpperCase()}</text>
@@ -306,7 +324,6 @@ export default function Dashboard() {
             </div>
           </div>
 
-          {/* Status row */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 20, flexWrap: 'wrap', justifyContent: 'center' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
               <div style={{ width: 6, height: 6, borderRadius: '50%', background: connected.google ? 'var(--green)' : 'var(--text-dim)', boxShadow: connected.google ? '0 0 6px var(--green)' : 'none' }} />
@@ -327,7 +344,6 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* Metrics */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 14, marginBottom: 44 }}>
           {[
             { label: 'Newsletters Found', value: scanResults?.newsletters_found ?? '--', sub: 'from Gmail scan' },
@@ -342,50 +358,60 @@ export default function Dashboard() {
           ))}
         </div>
 
-        {/* Platforms */}
         <div className="divider" style={{ marginBottom: 18 }}>
           <span className="divider-label">Connected Platforms</span>
           <div className="divider-line" />
         </div>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 44 }}>
-          {platforms.map(p => (
-            <div key={p.id}
-              onClick={() => p.id === 'brokers' ? navigate('/removal') : p.id === 'google' && !p.isConnected ? navigate('/connect') : null}
+          {platforms.map(platform => (
+            <div key={platform.id}
+              onClick={() => {
+                if (platform.soon) return
+                if (platform.id === 'brokers') navigate('/removal')
+                else if (platform.id === 'google' && !platform.isConnected) navigate('/connect')
+              }}
               style={{
                 background: 'var(--surface)',
-                border: `1px solid ${p.isConnected ? 'rgba(57,255,138,0.3)' : 'var(--border)'}`,
+                border: `1px solid ${platform.isConnected ? 'rgba(57,255,138,0.3)' : 'var(--border)'}`,
                 borderRadius: 'var(--radius-lg)', padding: '20px 24px',
                 display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                cursor: 'pointer', transition: 'all 0.25s ease'
+                cursor: platform.soon ? 'default' : 'pointer',
+                transition: 'all 0.25s ease',
+                opacity: platform.soon ? 0.5 : 1,
               }}
               onMouseEnter={e => {
+                if (platform.soon) return
                 e.currentTarget.style.borderColor = 'var(--pink)'
                 e.currentTarget.style.boxShadow = '0 0 32px var(--pink-glow-strong), 0 0 64px var(--pink-glow), inset 0 0 32px rgba(255,105,180,0.03)'
                 e.currentTarget.style.transform = 'translateY(-3px)'
                 e.currentTarget.style.background = 'rgba(255,105,180,0.04)'
               }}
               onMouseLeave={e => {
-                e.currentTarget.style.borderColor = p.isConnected ? 'rgba(57,255,138,0.3)' : 'var(--border)'
+                if (platform.soon) return
+                e.currentTarget.style.borderColor = platform.isConnected ? 'rgba(57,255,138,0.3)' : 'var(--border)'
                 e.currentTarget.style.boxShadow = 'none'
                 e.currentTarget.style.transform = 'translateY(0)'
                 e.currentTarget.style.background = 'var(--surface)'
               }}>
               <div>
-                <div style={{ fontSize: 15, fontWeight: 600, color: 'var(--text)', marginBottom: 5 }}>{p.label}</div>
-                <div style={{ fontSize: 13, color: 'var(--text-muted)' }}>{p.desc}</div>
+                <div style={{ fontSize: 15, fontWeight: 600, color: 'var(--text)', marginBottom: 5 }}>{platform.label}</div>
+                <div style={{ fontSize: 13, color: 'var(--text-muted)' }}>{platform.desc}</div>
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0 }}>
-                {p.isConnected && (
+                {platform.isConnected && (
                   <span style={{ fontSize: 10, color: 'var(--green)', fontWeight: 700, letterSpacing: '0.08em' }}>CONNECTED</span>
                 )}
-                <span className={`badge-${p.risk}`}>{p.risk}</span>
+                {platform.soon ? (
+                  <span style={{ fontSize: 10, color: 'var(--text-dim)', fontWeight: 600, letterSpacing: '0.06em', padding: '3px 10px', borderRadius: 20, border: '1px solid var(--border)', background: 'var(--surface-2)' }}>SOON</span>
+                ) : platform.risk ? (
+                  <span className={`badge-${platform.risk}`}>{platform.risk}</span>
+                ) : null}
               </div>
             </div>
           ))}
         </div>
 
-        {/* Scan results */}
         <div className="divider" style={{ marginBottom: 18 }}>
           <span className="divider-label">{scanResults ? `${scanResults.newsletters_found} Senders Identified` : 'Awaiting Scan'}</span>
           <div className="divider-line" />
