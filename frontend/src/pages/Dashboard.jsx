@@ -290,8 +290,8 @@ export default function Dashboard() {
             </defs>
           </svg>
 
-          <div style={{ position: 'relative', marginBottom: 32, filter: score > 60 ? 'url(#noise-filter)' : 'none', transition: 'filter 1.2s ease' }}>
-            <svg width="220" height="260" viewBox="0 0 220 260">
+          <div style={{ position: 'relative', marginBottom: 16, filter: score > 60 ? 'url(#noise-filter)' : 'none', transition: 'filter 1.2s ease' }}>
+            <svg width="220" height="220" viewBox="0 0 220 220">
               <circle cx="110" cy="110" r="95" fill="none" stroke="var(--surface-2)" strokeWidth="8"/>
               <circle cx="110" cy="110" r="95" fill="none" stroke={scoreColor} strokeWidth="8"
                 strokeDasharray={`${(score/100)*596.9} 596.9`}
@@ -300,8 +300,10 @@ export default function Dashboard() {
               <text x="110" y="100" textAnchor="middle" fontSize="52" fontWeight="700" fill={scoreColor} fontFamily="var(--font-body)">{score}</text>
               <text x="110" y="124" textAnchor="middle" fontSize="13" fill="var(--text-muted)" fontFamily="var(--font-body)">exposure score</text>
               <text x="110" y="144" textAnchor="middle" fontSize="11" fill={scoreColor} fontFamily="var(--font-body)" fontWeight="600">{scoreLabel.toUpperCase()}</text>
-              <text x="110" y="168" textAnchor="middle" fontSize="9" fill={scoreColor} fontFamily="'Press Start 2P', monospace" letterSpacing="0.04">{threatText}</text>
             </svg>
+            <div style={{ textAlign: 'center', marginTop: 12, fontSize: 9, color: scoreColor, fontFamily: "'Press Start 2P', monospace", letterSpacing: '0.04em', lineHeight: 1.8 }}>
+              {threatText}
+            </div>
           </div>
 
           <div style={{ textAlign: 'center', marginBottom: 24 }}>
