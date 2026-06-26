@@ -288,7 +288,7 @@ export default function Dashboard() {
 
         <div style={{
           display: 'flex', flexDirection: 'column', alignItems: 'center',
-          padding: '52px 0 56px', borderBottom: '1px solid var(--border)', marginBottom: 44
+          padding: '28px 0 32px', borderBottom: '1px solid var(--border)', marginBottom: 32
         }}>
           <svg width="0" height="0" style={{ position: 'absolute' }}>
             <defs>
@@ -315,10 +315,7 @@ export default function Dashboard() {
           </div>
 
           <div style={{ textAlign: 'center', marginBottom: 24 }}>
-            <div style={{ fontSize: 20, fontWeight: 700, color: threatColor, marginBottom: 10, fontFamily: 'var(--font-display)', fontSize: 13, letterSpacing: '0.04em' }}>
-              {threatText}
-          </div>
-            <div style={{ fontSize: 15, color: 'var(--text-muted)', maxWidth: 420, lineHeight: 1.6 }}>
+            <div style={{ fontSize: 15, color: 'var(--text-muted)', maxWidth: 420, lineHeight: 1.6, textAlign: 'center' }}>
               {connected.google
                 ? `Specter has scanned your connected accounts. ${scanResults ? `${scanResults.newsletters_found} newsletter senders identified.` : 'Run a scan to detect exposure.'}`
                 : 'Connect your accounts to let Specter scan and quantify your digital exposure across platforms.'
