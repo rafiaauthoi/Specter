@@ -244,17 +244,6 @@ export default function Dashboard() {
   return (
     <div style={{ minHeight: '100vh', background: 'var(--bg)' }}>
 
-      <div style={{
-        background: `${threatColor}12`,
-        borderBottom: `1px solid ${threatColor}30`,
-        padding: '8px 24px', textAlign: 'center',
-        position: 'relative', zIndex: 101
-      }}>
-        <span style={{ fontSize: 9, color: threatColor, fontFamily: 'var(--font-display)', letterSpacing: '0.06em' }}>
-          {threatText}
-        </span>
-      </div>
-
       {toast && (
         <div style={{
           position: 'fixed', top: 20, right: 20, zIndex: 998,
@@ -302,7 +291,7 @@ export default function Dashboard() {
           </svg>
 
           <div style={{ position: 'relative', marginBottom: 32, filter: score > 60 ? 'url(#noise-filter)' : 'none', transition: 'filter 1.2s ease' }}>
-            <svg width="220" height="220" viewBox="0 0 220 220">
+            <svg width="220" height="260" viewBox="0 0 220 260">
               <circle cx="110" cy="110" r="95" fill="none" stroke="var(--surface-2)" strokeWidth="8"/>
               <circle cx="110" cy="110" r="95" fill="none" stroke={scoreColor} strokeWidth="8"
                 strokeDasharray={`${(score/100)*596.9} 596.9`}
@@ -311,6 +300,7 @@ export default function Dashboard() {
               <text x="110" y="100" textAnchor="middle" fontSize="52" fontWeight="700" fill={scoreColor} fontFamily="var(--font-body)">{score}</text>
               <text x="110" y="124" textAnchor="middle" fontSize="13" fill="var(--text-muted)" fontFamily="var(--font-body)">exposure score</text>
               <text x="110" y="144" textAnchor="middle" fontSize="11" fill={scoreColor} fontFamily="var(--font-body)" fontWeight="600">{scoreLabel.toUpperCase()}</text>
+              <text x="110" y="168" textAnchor="middle" fontSize="9" fill={scoreColor} fontFamily="'Press Start 2P', monospace" letterSpacing="0.04">{threatText}</text>
             </svg>
           </div>
 
