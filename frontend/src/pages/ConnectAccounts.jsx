@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Footer from '../components/Footer'
 
@@ -25,18 +26,44 @@ const RedditIcon = () => (
 const icons = { google: GoogleIcon, twitter: TwitterIcon, reddit: RedditIcon }
 
 const platforms = [
-  { id: 'google',  label: 'Google',      desc: 'Gmail newsletters, Search history, YouTube activity', what: 'Scans and deletes newsletter emails and activity history' },
-  { id: 'twitter', label: 'Twitter / X', desc: 'Tweets, likes, replies older than a set date',         what: 'Bulk deletes old tweets and likes' },
-  { id: 'reddit',  label: 'Reddit',      desc: 'Posts and comments across all subreddits',             what: 'Deletes posts and comments by date or subreddit' },
+  { id: 'google',  label: 'Google',      desc: 'Gmail newsletters, Search history, YouTube activity', what: 'Scans and deletes newsletter emails and activity history', soon: false },
+  { id: 'twitter', label: 'Twitter / X', desc: 'Tweet deletion coming soon',                           what: 'Bulk deletes old tweets and likes',                      soon: true  },
+  { id: 'reddit',  label: 'Reddit',      desc: 'Post and comment deletion coming soon',                what: 'Deletes posts and comments by date or subreddit',        soon: true  },
 ]
 
 export default function ConnectAccounts() {
   const navigate = useNavigate()
+  const [toast, setToast] = useState(null)
+
+  function showToast(msg) {
+    setToast(msg)
+    setTimeout(() => setToast(null), 3000)
+  }
+
+  function handleConnect(platform) {
+    if (platform.soon) {
+      showToast(`${platform.label} integration is coming soon.`)
+      return
+    }
+    window.location.href = `${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/auth/${platform.id}?user_id=${localStorage.getItem('user_id') || 'demo-user'}`
+  }
 
   return (
     <div style={{ minHeight: '100vh', background: 'var(--bg)' }}>
+
+      {toast && (
+        <div style={{
+          position: 'fixed', top: 20, right: 20, zIndex: 998,
+          background: 'var(--surface)', border: '1px solid var(--border-active)',
+          color: 'var(--pink)', padding: '12px 20px', borderRadius: 'var(--radius)',
+          fontSize: 13, boxShadow: '0 0 20px var(--pink-glow)', fontFamily: 'var(--font-body)'
+        }}>
+          {toast}
+        </div>
+      )}
+
       <nav className="navbar">
-        <span className="navbar-logo">Specter</span>
+        <span className="navbar-logo">specter</span>
         <button onClick={() => navigate('/dashboard')}
           style={{ background: 'none', border: 'none', color: 'var(--text-muted)', fontSize: 11, cursor: 'pointer', fontFamily: 'var(--font-body)' }}>
           Back to dashboard
@@ -55,21 +82,27 @@ export default function ConnectAccounts() {
           {platforms.map(p => {
             const Icon = icons[p.id]
             return (
-              <div key={p.id} className="card" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16 }}>
+              <div key={p.id} className="card" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16, opacity: p.soon ? 0.6 : 1 }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
                   <div style={{ width: 36, height: 36, borderRadius: 'var(--radius)', background: 'var(--surface-2)', border: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                     <Icon />
                   </div>
                   <div>
-                    <div style={{ fontSize: 13, fontWeight: 500, color: 'var(--text)', marginBottom: 2 }}>{p.label}</div>
+                    <div style={{ fontSize: 13, fontWeight: 500, color: 'var(--text)', marginBottom: 2, display: 'flex', alignItems: 'center', gap: 8 }}>
+                      {p.label}
+                      {p.soon && (
+                        <span style={{ fontSize: 9, color: 'var(--text-dim)', fontWeight: 600, letterSpacing: '0.06em', padding: '2px 8px', borderRadius: 20, border: '1px solid var(--border)', background: 'var(--surface-2)' }}>SOON</span>
+                      )}
+                    </div>
                     <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>{p.desc}</div>
                     <div style={{ fontSize: 10, color: 'var(--text-dim)', marginTop: 2 }}>{p.what}</div>
                   </div>
                 </div>
                 <button
-                  onClick={() => window.location.href = `${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/auth/${p.id}?user_id=${localStorage.getItem('user_id') || 'demo-user'}`}
-                  className="btn-primary" style={{ flexShrink: 0, fontSize: 11 }}>
-                  Connect
+                  onClick={() => handleConnect(p)}
+                  className={p.soon ? 'btn-ghost' : 'btn-primary'}
+                  style={{ flexShrink: 0, fontSize: 11, opacity: p.soon ? 0.5 : 1, cursor: p.soon ? 'not-allowed' : 'pointer' }}>
+                  {p.soon ? 'Soon' : 'Connect'}
                 </button>
               </div>
             )

@@ -40,7 +40,7 @@ export default function Login() {
   return (
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', background: 'var(--bg)' }}>
       <nav className="navbar">
-        <span className="navbar-logo">Specter</span>
+        <span className="navbar-logo">specter</span>
       </nav>
 
       <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '32px 24px' }}>
@@ -95,7 +95,10 @@ export default function Login() {
           </div>
         </div>
       </div>
-      <Footer />
+
+      <div style={{ padding: '0 24px' }}>
+        <Footer />
+      </div>
     </div>
   )
 }

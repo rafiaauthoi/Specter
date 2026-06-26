@@ -315,7 +315,9 @@ export default function Dashboard() {
           </div>
 
           <div style={{ textAlign: 'center', marginBottom: 24 }}>
-            <div style={{ fontSize: 32, fontWeight: 700, color: 'var(--text)', marginBottom: 10 }}>Your Footprint</div>
+            <div style={{ fontSize: 20, fontWeight: 700, color: threatColor, marginBottom: 10, fontFamily: 'var(--font-display)', fontSize: 13, letterSpacing: '0.04em' }}>
+              {threatText}
+          </div>
             <div style={{ fontSize: 15, color: 'var(--text-muted)', maxWidth: 420, lineHeight: 1.6 }}>
               {connected.google
                 ? `Specter has scanned your connected accounts. ${scanResults ? `${scanResults.newsletters_found} newsletter senders identified.` : 'Run a scan to detect exposure.'}`
@@ -378,6 +380,7 @@ export default function Dashboard() {
                 display: 'flex', alignItems: 'center', justifyContent: 'space-between',
                 cursor: platform.soon ? 'default' : 'pointer',
                 transition: 'all 0.25s ease',
+                willChange: 'transform, box-shadow',
                 opacity: platform.soon ? 0.5 : 1,
               }}
               onMouseEnter={e => {
@@ -452,6 +455,7 @@ export default function Dashboard() {
                     borderRadius: 'var(--radius)', padding: '14px 20px',
                     display: 'flex', justifyContent: 'space-between', alignItems: 'center',
                     opacity: isDone ? 0.45 : 1, transition: 'all 0.3s ease',
+                    willChange: 'transform, box-shadow',
                     animation: `reveal 0.3s ease ${i * 0.04}s both`
                   }}
                   onMouseEnter={e => {
