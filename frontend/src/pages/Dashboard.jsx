@@ -41,7 +41,7 @@ export default function Dashboard() {
   const [displayText, setDisplayText] = useState('')
   const [typing, setTyping] = useState(true)
 
-  const [score, setScore] = useState(74)
+  const [score, setScore] = useState(0)
   const [scanning, setScanning] = useState(false)
   const [scanResults, setScanResults] = useState(() => {
     const saved = localStorage.getItem('scan_results')
@@ -170,14 +170,10 @@ export default function Dashboard() {
     }
   }
 
-  const scoreColor = score > 60 ? 'var(--red)' : score > 30 ? 'var(--orange)' : 'var(--green)'
-  const scoreLabel = score > 60 ? 'High Exposure' : score > 30 ? 'Medium Exposure' : 'Clean'
-  const threatColor = score > 60 ? 'var(--red)' : score > 30 ? 'var(--orange)' : 'var(--green)'
-  const threatText = score > 60
-    ? 'THREAT LEVEL: HIGH — your digital footprint is exposed'
-    : score > 30
-    ? 'THREAT LEVEL: MEDIUM — some exposure detected'
-    : 'THREAT LEVEL: LOW — footprint is minimal'
+  const scoreColor = !scanResults ? 'var(--text-dim)' : score > 60 ? 'var(--red)' : score > 30 ? 'var(--orange)' : 'var(--green)'
+  const scoreLabel = !scanResults ? 'not scanned' : score > 60 ? 'High Exposure' : score > 30 ? 'Medium Exposure' : 'Clean'
+  const threatColor = !scanResults ? 'var(--text-dim)' : score > 60 ? 'var(--red)' : score > 30 ? 'var(--orange)' : 'var(--green)'
+  const threatText = !scanResults ? 'run a scan to assess your exposure' : score > 60 ? 'THREAT LEVEL: HIGH - your digital footprint is exposed' : score > 30 ? 'THREAT LEVEL: MEDIUM - some exposure detected' : 'THREAT LEVEL: LOW - footprint is minimal'
 
   const platforms = [
     {
