@@ -290,7 +290,7 @@ export default function Dashboard() {
             </defs>
           </svg>
 
-          <div style={{ position: 'relative', marginBottom: 16, filter: score > 60 ? 'url(#noise-filter)' : 'none', transition: 'filter 1.2s ease' }}>
+          <div style={{ position: 'relative', marginBottom: 16, filter: score > 60 ? 'url(#noise-filter)' : 'none', transition: 'filter 1.2s ease', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
             <svg width="220" height="220" viewBox="0 0 220 220">
               <circle cx="110" cy="110" r="95" fill="none" stroke="var(--surface-2)" strokeWidth="8"/>
               <circle cx="110" cy="110" r="95" fill="none" stroke={scoreColor} strokeWidth="8"
