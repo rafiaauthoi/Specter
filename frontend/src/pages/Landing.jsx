@@ -57,10 +57,18 @@ function CheckIcon() {
 
 function GhostMark({ size = 22 }) {
   return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" style={{ filter: 'drop-shadow(0 0 4px var(--pink-glow-strong))' }}>
-      <path d="M12 2C7.58 2 4 5.58 4 10v10.2c0 .6.65.98 1.17.68l1.68-.97a1 1 0 0 1 1.15.12l1.36 1.2a1 1 0 0 0 1.32 0l1.32-1.17a1 1 0 0 1 1.32 0l1.32 1.17a1 1 0 0 0 1.32 0l1.36-1.2a1 1 0 0 1 1.15-.12l1.68.97c.52.3 1.17-.08 1.17-.68V10c0-4.42-3.58-8-8-8Z" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round" />
-      <circle cx="9" cy="10.5" r="1.15" fill="currentColor" />
-      <circle cx="15" cy="10.5" r="1.15" fill="currentColor" />
+    <svg width={size} height={size} viewBox="0 0 100 100" style={{ filter: 'drop-shadow(0 0 4px var(--pink-glow-strong))' }}>
+      <defs>
+        <linearGradient id="ghostMarkGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#ff69b4" stopOpacity="1" />
+          <stop offset="100%" stopColor="#c44d8a" stopOpacity="1" />
+        </linearGradient>
+      </defs>
+      <path d="M 50 10 C 25 10 15 28 15 48 L 15 85 L 25 75 L 35 85 L 45 75 L 55 85 L 65 75 L 75 85 L 85 75 L 85 48 C 85 28 75 10 50 10 Z" fill="url(#ghostMarkGrad)" />
+      <circle cx="38" cy="45" r="7" fill="#0a0a0f" />
+      <circle cx="62" cy="45" r="7" fill="#0a0a0f" />
+      <circle cx="41" cy="42" r="2.5" fill="#ff69b4" opacity="0.6" />
+      <circle cx="65" cy="42" r="2.5" fill="#ff69b4" opacity="0.6" />
     </svg>
   )
 }

@@ -1,30 +1,7 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
-  <defs>
-    <linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#ff69b4;stop-opacity:1" />
-      <stop offset="100%" style="stop-color:#c44d8a;stop-opacity:1" />
-    </linearGradient>
-  </defs>
-  <!-- Ghost body -->
-  <path d="
-    M 50 10
-    C 25 10 15 28 15 48
-    L 15 85
-    L 25 75
-    L 35 85
-    L 45 75
-    L 55 85
-    L 65 75
-    L 75 85
-    L 85 75
-    L 85 48
-    C 85 28 75 10 50 10
-    Z
-  " fill="url(#g)" />
-  <!-- Eyes -->
-  <circle cx="38" cy="45" r="7" fill="#0a0a0f" />
-  <circle cx="62" cy="45" r="7" fill="#0a0a0f" />
-  <!-- Eye shine -->
-  <circle cx="41" cy="42" r="2.5" fill="#ff69b4" opacity="0.6" />
-  <circle cx="65" cy="42" r="2.5" fill="#ff69b4" opacity="0.6" />
+<?xml version="1.0" encoding="utf-8"?>
+<svg width="800px" height="800px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M9 15C9.85038 15.6303 10.8846 16 12 16C13.1154 16 14.1496 15.6303 15 15" stroke="#ff69b4" stroke-width="1.5" stroke-linecap="round"/>
+<ellipse cx="15" cy="9.5" rx="1" ry="1.5" fill="#ff69b4"/>
+<ellipse cx="9" cy="9.5" rx="1" ry="1.5" fill="#ff69b4"/>
+<path d="M22 19.723V12.3006C22 6.61173 17.5228 2 12 2C6.47715 2 2 6.61173 2 12.3006V19.723C2 21.0453 3.35098 21.9054 4.4992 21.314C5.42726 20.836 6.5328 20.9069 7.39614 21.4998C8.36736 22.1667 9.63264 22.1667 10.6039 21.4998L10.9565 21.2576C11.5884 20.8237 12.4116 20.8237 13.0435 21.2576L13.3961 21.4998C14.3674 22.1667 15.6326 22.1667 16.6039 21.4998C17.4672 20.9069 18.5727 20.836 19.5008 21.314C20.649 21.9054 22 21.0453 22 19.723Z" stroke="#ff69b4" stroke-width="1.5"/>
 </svg>
